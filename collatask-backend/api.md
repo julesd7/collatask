@@ -19,10 +19,17 @@ Creates a new user.
     - `201 Created`: User created successfully.
         ```json
         {
-            "message": "User created successfully."
+            "message": "User registered successfully.",
+            "user_id": id
         }
         ```
-    - `400 Bad Request`: Missing information or user already exists.
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "All fields are required."
+        }
+        ```
+    - `409 Conflict`: User already exists.
         ```json
         {
             "error": "Username or email already exists."
@@ -54,10 +61,16 @@ Authenticates a user.
         "token": "jwt_token_here"
     }
     ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "All fields are required."
+        }
+        ```
   - `401 Unauthorized`: Incorrect credentials.
     ```json
     {
-        "error": "Invalid username or password."
+        "error": "Invalid credentials."
     }
     ```
   - `500 Internal Server Error`: Server error.
@@ -85,10 +98,16 @@ Retrieves the authenticated user's information.
                 "created_at": "timestamp"
         }
         ```
-    - `403 Forbidden`: Missing or invalid token.
+    - `401 Unauthorized`: Missing token.
         ```json
         {
                 "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+                "error": "Forbidden access."
         }
         ```
     - `500 Internal Server Error`: Server error.
@@ -123,16 +142,22 @@ Updates the authenticated user's information.
         ```json
         {}
         ```
-    - `400 Bad Request`: Missing information or user already exists.
-        ```json
-        {
-            "error": "Username or email already exists."
-        }
-        ```
-    - `403 Forbidden`: Missing or invalid token.
+    - `401 Unauthorized`: Missing token.
         ```json
         {
             "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+    - `409 Conflit`: User already exists.
+        ```json
+        {
+            "error": "Username or email already exists."
         }
         ```
     - `500 Internal Server Error`: Server error.
@@ -158,13 +183,19 @@ Deletes the authenticated user's account.
     - `401 Unauthorized`: Missing token.
         ```json
         {
-            "error": "Forbidden."
+            "error": "Unauthorized access."
         }
         ```
-    - `403 Forbidden`: invalid token.
+    - `403 Forbidden`: Invalid token.
         ```json
         {
-            "error": "Forbidden."
+            "error": "Forbidden access."
+        }
+        ```
+        - `404 Not Found`: User not found.
+        ```json
+        {
+            "error": "User not found."
         }
         ```
     - `500 Internal Server Error`: Server error.
@@ -176,15 +207,17 @@ Deletes the authenticated user's account.
 
 ## Project Management
 
-### POST `/api/projects`
+### POST `/api/projects/`
 Creates a new project.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
 
 - **Request Body:**
     ```json
     {
         "name": "string",
-        "description": "string",
-        "user_id": id
+        "description": "string" // Optional
     }
     ```
 
@@ -192,15 +225,32 @@ Creates a new project.
     - `201 Created`: Project created successfully.
         ```json
         {
-            "project_id": id,
-            "name": "string",
-            "description": "string"
+            "message": "Project created successfully",
+            "project_id": id
         }
         ```
-    - `400 Bad Request`: Missing information or project already exists.
+    - `400 Bad Request`: Missing information.
         ```json
         {
-            "error": "Project name is required or project already exists."
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+    - `409 Conflict`: Project already exists.
+        ```json
+        {
+            "error": "Project already exists."
         }
         ```
     - `500 Internal Server Error`: Server error.
@@ -210,18 +260,20 @@ Creates a new project.
         }
         ```
 
-### PUT `/api/projects/:id`
+### PUT `/api/projects/:project_id`
 Modifies an existing project.
 
 - **Request Parameters:**
-    - `id`: Project ID.
+    - `project_id`: Project ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
 
 - **Request Body:**
     ```json
     {
-        "name": "string",
-        "description": "string",
-        "user_id": id
+        "name": "string", // Optional
+        "description": "string", // Optional
     }
     ```
 
@@ -234,16 +286,26 @@ Modifies an existing project.
             "description": "string"
         }
         ```
+    - `204 No Content`: No information provided to update.
+        ```json
+        {}
+        ```
     - `400 Bad Request`: Missing or invalid information.
         ```json
         {
             "error": "At least one field (name or description) is required to update."
         }
         ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
     - `403 Forbidden`: User is not the creator of the project.
         ```json
         {
-            "error": "You are not authorized to modify this project."
+            "error": "Forbidden access."
         }
         ```
     - `404 Not Found`: Project not found.
@@ -259,25 +321,32 @@ Modifies an existing project.
         }
         ```
 
-### DELETE `/api/projects/:id`
+### DELETE `/api/projects/:project_id`
 Deletes a project if the user is the creator.
 
 - **Request Parameters:**
-  - `id`: Project ID.
+  - `project_id`: Project ID.
 
-- **Request Body:**
-  ```json
-  {
-    "user_id": id
-  }
-  ```
+- **Headers:**
+    - `Authorization`: Bearer _token_.
 
 - **Response:**
   - `200 OK`: Project deleted successfully.
+      ```json
+      {
+          "message": "Project deleted successfully."
+      }
+      ```
+    - `401 Unauthorized`: Missing token.
+      ```json
+      {
+          "error": "Unauthorized access."
+      }
+      ```
   - `403 Forbidden`: User is not the creator of the project.
       ```json
       {
-          "error": "You are not authorized to delete this project."
+          "error": "Forbidden access."
       }
       ```
   - `404 Not Found`: Project not found.
@@ -295,15 +364,20 @@ Deletes a project if the user is the creator.
 
 ### Project Assignments
 
-### POST `/api/project-assignments/assign-project`
+### POST `/api/project-assignments/assign/:project_id`
 Assigns a project to a user.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
 
 - **Request Body:**
   ```json
   {
     "user_id": id,
-    "project_id": "string",
-    "role": "string" // Optional, defaults to "member"
+    "role": "string" // Optional, defaults to "viewer"
   }
   ```
 
@@ -314,7 +388,31 @@ Assigns a project to a user.
           "message": "Project assigned successfully."
       }
       ```
-  - `400 Bad Request`: Missing information or user already assigned.
+    - `400 Bad Request`: Missing information.
+      ```json
+      {
+          "error": "Missing information."
+      }
+      ```
+    - `401 Bad Request`: Missing token.
+      ```json
+      {
+          "error": "Unauthorized access."
+      }
+      ```
+    - `403 Forbidden`: User is not the creator of the project.
+      ```json
+      {
+          "error": "Forbidden access."
+      }
+      ```
+    - `404 Not Found`: Project not found.
+      ```json
+      {
+          "error": "Project not found."
+      }
+      ```
+    - `409 Conflict`: User already assigned to this project.
       ```json
       {
           "error": "User already assigned to this project."
@@ -329,11 +427,11 @@ Assigns a project to a user.
 
 ## Project Retrieval
 
-### GET `/api/user-projects/:userId`
+### GET `/api/user-projects/`
 Retrieves projects associated with a user.
 
-- **Request Parameters:**
-    - `userId`: User ID.
+- **Headers:**
+    - `Authorization`: Bearer _token_.
 
 - **Response:**
     - `200 OK`: List of projects.
@@ -346,6 +444,18 @@ Retrieves projects associated with a user.
             },
             ...
         ]
+        ```
+     - `401 Unauthorized`: Missing token.
+        ```json
+        {
+                "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+                "error": "Forbidden access."
+        }
         ```
     - `404 Not Found`: No projects found for this user.
         ```json
@@ -360,11 +470,131 @@ Retrieves projects associated with a user.
         }
         ```
 
+### `PUT /api/project-assignments/role/:project_id`
+Updates a user's role in a project.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Request Body:**
+    ```json
+    {
+        "user_id": id,
+        "role": "string"
+    }
+    ```
+
+- **Response:**
+    - `200 OK`: Role updated successfully.
+        ```json
+        {
+            "message": "User role updated successfully."
+        }
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: User is not the creator of the project.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+    - `404 Not Found`: Project not found.
+        ```json
+        {
+            "error": "Project not found."
+        }
+        ```
+        ```json
+        {
+            "error": "User not assigned to this project."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
+### DELETE `/api/project-assignments/remove/:project_id`
+Removes a user from a project.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Request Body:**
+    ```json
+    {
+        "user_id": id
+    }
+    ```
+
+- **Response:**
+    - `200 OK`: User removed successfully.
+        ```json
+        {
+            "message": "User removed successfully."
+        }
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: User is not the creator of the project.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+    - `404 Not Found`: Project not found.
+        ```json
+        {
+            "error": "Project not found."
+        }
+        ```
+        ```json
+        {
+            "error": "User not assigned to this project."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
 ## Route Files
 
 - `routes/auth.js`
 - `routes/project.js`
 - `routes/projectAssignments.js`
+- `routes/user.js`
 - `routes/userProjects.js`
 
 ## Server
