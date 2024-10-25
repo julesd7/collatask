@@ -67,6 +67,113 @@ Authenticates a user.
     }
     ```
 
+## User Management
+
+### GET `/api/user/me`
+Retrieves the authenticated user's information.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Response:**
+    - `200 OK`: User information retrieved successfully.
+        ```json
+        {
+                "user_id": id,
+                "username": "string",
+                "email": "string",
+                "created_at": "timestamp"
+        }
+        ```
+    - `403 Forbidden`: Missing or invalid token.
+        ```json
+        {
+                "error": "Unauthorized access."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+                "error": "Internal server error."
+        }
+        ```
+
+### PUT `/api/user/update`
+Updates the authenticated user's information.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Request Body:**
+    ```json
+    {
+        "username": "string", // Optional
+        "email": "string", // Optional
+        "password": "string" // Optional
+    }
+    ```
+- **Response:**
+    - `200 OK`: User information updated successfully.
+        ```json
+        {
+            "message": "User information updated successfully."
+        }
+        ```
+    - `204 No Content`: No information provided to update.
+        ```json
+        {}
+        ```
+    - `400 Bad Request`: Missing information or user already exists.
+        ```json
+        {
+            "error": "Username or email already exists."
+        }
+        ```
+    - `403 Forbidden`: Missing or invalid token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
+### DELETE `/api/user/delete`
+Deletes the authenticated user's account.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Response:**
+    - `200 OK`: User deleted successfully.
+        ```json
+        {
+            "message": "User deleted successfully."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Forbidden."
+        }
+        ```
+    - `403 Forbidden`: invalid token.
+        ```json
+        {
+            "error": "Forbidden."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
 ## Project Management
 
 ### POST `/api/projects`
