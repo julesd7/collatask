@@ -5,7 +5,7 @@ const authenticateJWT = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
-        return res.sendStatus(401);
+        return res.sendStatus(401).json({ error: 'Unauthorized access.' });
     }
 
     try {
@@ -17,7 +17,7 @@ const authenticateJWT = async (req, res, next) => {
 
         next();
     } catch (err) {
-        return res.sendStatus(403);
+        return res.sendStatus(403).json({ error: 'Forbidden access.' });
     }
 };
 
