@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
         );
 
         if (userCheck.rows.length > 0) {
-            return res.status(400).json({ error: 'Username or email already exists' });
+            return res.status(409).json({ error: 'Username or email already exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
         );
 
         const userId = result.rows[0].id;
-        res.status(201).json({ id: userId, username });
+        res.status(201).json({ message: 'User registered successfully.', user_id: userId });
     } catch (error) {
         console.error('Error registering user', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
     const { identifier, password, rememberMe } = req.body;
 
     if (!identifier) {
-        return res.status(400).json({ error: 'Identifier is required' });
+        return res.status(400).json({ error: 'All fields are required..' });
     }
 
     try {
@@ -56,19 +56,19 @@ router.post('/login', async (req, res) => {
 
         if (!user) {
             console.error('User not found with identifier:', identifier);
-            return res.status(400).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             console.error('Password does not match for user:', user.username);
-            return res.status(400).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
         const expiresIn = rememberMe ? '14d' : '1h';
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn });
 
-        res.json({ token });
+        res.status(200).json({ token });
     } catch (error) {
         console.error('Error logging in user', error);
         res.status(500).json({ error: 'Internal server error' });
