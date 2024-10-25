@@ -1,12 +1,12 @@
-// routes/userProjects.js
-
+// userProjects.js
 const express = require('express');
 const { pool } = require('../db');
+const { authenticateJWT } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-// Get all projects assigned to a user
-router.get('/user-projects/:userId', async (req, res) => {
-    const { userId } = req.params;
+// Get all projects assigned to the authenticated user
+router.get('/', authenticateJWT, async (req, res) => {
+    const userId = req.user.id;
 
     try {
         const result = await pool.query(`
@@ -20,7 +20,7 @@ router.get('/user-projects/:userId', async (req, res) => {
             return res.status(404).json({ error: 'No projects found for this user' });
         }
 
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (error) {
         console.error('Error fetching projects for user', error);
         res.status(500).json({ error: 'Internal server error' });
