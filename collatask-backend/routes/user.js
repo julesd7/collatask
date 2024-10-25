@@ -1,3 +1,4 @@
+// user.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { pool } = require('../db');
@@ -5,8 +6,9 @@ const router = express.Router();
 
 const { authenticateJWT } = require('../middleware/authMiddleware');
 
+// Endpoint to get user information
 router.get('/me', authenticateJWT, (req, res) => {
-    res.json({
+    res.status(200).json({
         id: req.user.id,
         username: req.user.username,
         email: req.user.email,
@@ -27,7 +29,7 @@ router.put('/update', authenticateJWT, async (req, res) => {
             );
 
             if (existingUserCheck.rows.length > 0) {
-                return res.status(400).json({ error: 'Username or email already exists.' });
+                return res.status(409).json({ error: 'Username or email already exists.' });
             }
         }
 
@@ -65,7 +67,7 @@ router.put('/update', authenticateJWT, async (req, res) => {
     }
 });
 
-// Endpoint pour supprimer l'utilisateur
+// Endpoint to delete user
 router.delete('/delete', authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
@@ -76,7 +78,7 @@ router.delete('/delete', authenticateJWT, async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        res.json({ message: 'User deleted successfully' });
+        res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
         console.error('Error deleting user', error);
         res.status(500).json({ error: 'Internal server error' });
