@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Route to register a new user
 router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, rememberMe } = req.body;
 
     if (!username || !email || !password) {
         return res.status(400).json({ error: 'All fields are required' });
@@ -31,7 +31,10 @@ router.post('/register', async (req, res) => {
         );
 
         const userId = result.rows[0].id;
-        res.status(201).json({ message: 'User registered successfully.', user_id: userId });
+        const expiresIn = rememberMe ? '14d' : '1d';
+        const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn });
+
+        res.status(201).json({ message: 'User registered successfully.', user_id: userId, token: token });
     } catch (error) {
         console.error('Error registering user', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -65,7 +68,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
-        const expiresIn = rememberMe ? '14d' : '1h';
+        const expiresIn = rememberMe ? '14d' : '1d';
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn });
 
         res.status(200).json({ token });
