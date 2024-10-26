@@ -68,6 +68,22 @@ $$;
 ALTER FUNCTION public.update_board_timestamp() OWNER TO jules;
 
 --
+-- Name: update_card_last_change(); Type: FUNCTION; Schema: public; Owner: jules
+--
+
+CREATE FUNCTION public.update_card_last_change() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.last_change = CURRENT_TIMESTAMP;  -- Met à jour le champ last_change à l'heure actuelle
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.update_card_last_change() OWNER TO jules;
+
+--
 -- Name: update_task_timestamp(); Type: FUNCTION; Schema: public; Owner: jules
 --
 
@@ -155,6 +171,40 @@ ALTER TABLE public.boards_id_seq OWNER TO jules;
 
 ALTER SEQUENCE public.boards_id_seq OWNED BY public.boards.id;
 
+
+--
+-- Name: cards_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
+--
+
+CREATE SEQUENCE public.cards_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.cards_id_seq OWNER TO jules;
+
+--
+-- Name: cards; Type: TABLE; Schema: public; Owner: jules
+--
+
+CREATE TABLE public.cards (
+    id integer DEFAULT nextval('public.cards_id_seq'::regclass) NOT NULL,
+    title character varying(100) NOT NULL,
+    description text,
+    board_id integer NOT NULL,
+    project_id integer NOT NULL,
+    assignees_ids integer[],
+    start_date date,
+    end_date date,
+    last_change timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.cards OWNER TO jules;
 
 --
 -- Name: project_assignments; Type: TABLE; Schema: public; Owner: jules
@@ -353,6 +403,14 @@ ALTER TABLE ONLY public.boards
 
 
 --
+-- Name: cards cards_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
+--
+
+ALTER TABLE ONLY public.cards
+    ADD CONSTRAINT cards_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: project_assignments project_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
 --
 
@@ -430,6 +488,13 @@ CREATE TRIGGER trigger_update_board_timestamp BEFORE UPDATE ON public.boards FOR
 
 
 --
+-- Name: cards trigger_update_card_last_change; Type: TRIGGER; Schema: public; Owner: jules
+--
+
+CREATE TRIGGER trigger_update_card_last_change BEFORE UPDATE ON public.cards FOR EACH ROW EXECUTE FUNCTION public.update_card_last_change();
+
+
+--
 -- Name: tasks trigger_update_task_timestamp; Type: TRIGGER; Schema: public; Owner: jules
 --
 
@@ -449,6 +514,22 @@ CREATE TRIGGER trigger_update_timestamp BEFORE UPDATE ON public.projects FOR EAC
 
 ALTER TABLE ONLY public.boards
     ADD CONSTRAINT boards_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+
+--
+-- Name: cards cards_board_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
+--
+
+ALTER TABLE ONLY public.cards
+    ADD CONSTRAINT cards_board_id_fkey FOREIGN KEY (board_id) REFERENCES public.boards(id) ON DELETE CASCADE;
+
+
+--
+-- Name: cards cards_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
+--
+
+ALTER TABLE ONLY public.cards
+    ADD CONSTRAINT cards_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 
 --
