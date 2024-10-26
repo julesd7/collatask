@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/account', accountRoutes);
+app.use('/api/user', accountRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/project-assignments', projectAssignmentRoutes);
 app.use('/api/user-projects', userBoardsRoutes);
