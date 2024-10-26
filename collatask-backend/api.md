@@ -11,7 +11,8 @@ Creates a new user.
     {
         "username": "string",
         "email": "string",
-        "password": "string"
+        "password": "string",
+        "rememberMe": boolean // Optional
     }
     ```
 
@@ -20,7 +21,8 @@ Creates a new user.
         ```json
         {
             "message": "User registered successfully.",
-            "user_id": id
+            "user_id": id,
+            "token": "jwt_token_here"
         }
         ```
     - `400 Bad Request`: Missing information.
@@ -50,7 +52,7 @@ Authenticates a user.
   {
     "identifier": "string",
     "password": "string",
-    "rememberMe": boolean
+    "rememberMe": boolean // Optional
   }
   ```
 
@@ -61,12 +63,12 @@ Authenticates a user.
         "token": "jwt_token_here"
     }
     ```
-    - `400 Bad Request`: Missing information.
-        ```json
-        {
-            "error": "All fields are required."
-        }
-        ```
+  - `400 Bad Request`: Missing information.
+    ```json
+    {
+        "error": "All fields are required."
+    }
+    ```
   - `401 Unauthorized`: Incorrect credentials.
     ```json
     {
@@ -79,6 +81,8 @@ Authenticates a user.
         "error": "Internal server error."
     }
     ```
+
+#### Token generated on authentication is valid for 24 hours. If `rememberMe` is set to `true`, the token is valid for 30 days.
 
 ## User Management
 
@@ -192,7 +196,7 @@ Deletes the authenticated user's account.
             "error": "Forbidden access."
         }
         ```
-        - `404 Not Found`: User not found.
+    - `404 Not Found`: User not found.
         ```json
         {
             "error": "User not found."
@@ -337,7 +341,7 @@ Deletes a project if the user is the creator.
           "message": "Project deleted successfully."
       }
       ```
-    - `401 Unauthorized`: Missing token.
+  - `401 Unauthorized`: Missing token.
       ```json
       {
           "error": "Unauthorized access."
@@ -388,31 +392,31 @@ Assigns a project to a user.
           "message": "Project assigned successfully."
       }
       ```
-    - `400 Bad Request`: Missing information.
+  - `400 Bad Request`: Missing information.
       ```json
       {
           "error": "Missing information."
       }
       ```
-    - `401 Bad Request`: Missing token.
+  - `401 Bad Request`: Missing token.
       ```json
       {
           "error": "Unauthorized access."
       }
       ```
-    - `403 Forbidden`: User is not the creator of the project.
+  - `403 Forbidden`: User is not the creator of the project.
       ```json
       {
           "error": "Forbidden access."
       }
       ```
-    - `404 Not Found`: Project not found.
+  - `404 Not Found`: Project not found.
       ```json
       {
           "error": "Project not found."
       }
       ```
-    - `409 Conflict`: User already assigned to this project.
+  - `409 Conflict`: User already assigned to this project.
       ```json
       {
           "error": "User already assigned to this project."
@@ -588,10 +592,257 @@ Removes a user from a project.
             "error": "Internal server error."
         }
         ```
+    
+## Card Management
+
+### GET `/api/cards/:project_id/:board_id`
+Retrieves cards associated with a project and board.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+  - `board_id`: Board ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Response:**
+    - `200 OK`: List of cards.
+        ```json
+        [
+            {
+                "card_id": id,
+                "title": "string",
+                "description": "string",
+                "board_id": id,
+                "project_id": id,
+                "assignees_id": [id],
+                "start_date": "timestamp",
+                "end_date": "timestamp",
+                "last_change": "timestamp"
+            },
+            ...
+        ]
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+                "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+                "error": "Forbidden access."
+        }
+        ```
+    - `404 Not Found`: No cards found for this project and board.
+        ```json
+        {
+            "error": "No cards found for this project and board."
+        }
+        ```
+        ```json
+        {
+            "error": "Project or board not found."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
+### POST `/api/cards/:project_id/:board_id`
+Creates a new card.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+  - `board_id`: Board ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Request Body:**
+    ```json
+    {
+        "title": "string",
+        "description": "string", // Optional
+        "start_date": "timestamp", // Optional
+        "end_date": "timestamp" // Optional
+    }
+    ```
+
+- **Response:**
+    - `201 Created`: Card created successfully.
+        ```json
+        {
+            "message": "Card created successfully.",
+            "card_id": id
+        }
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+        ```json
+        {
+            "error": "User is not assigned to this project."
+        }
+        ```
+    - `404 Not Found`: Project or board not found.
+        ```json
+        {
+            "error": "Project or board not found."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
+### PUT `/api/cards/:project_id/:board_id/:card_id`
+Updates an existing card.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+  - `board_id`: Board ID.
+  - `card_id`: Card ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Request Body:**
+    ```json
+    {
+        "title": "string", // Optional
+        "description": "string", // Optional
+        "start_date": "timestamp", // Optional
+        "end_date": "timestamp" // Optional
+    }
+    ```
+
+- **Response:**
+    - `200 OK`: Card updated successfully.
+        ```json
+        {
+            "message": "Card updated successfully."
+        }
+        ```
+    - `204 No Content`: No information provided to update.
+        ```json
+        {}
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+        ```json
+        {
+            "error": "User is not assigned to this project."
+        }
+        ```
+    - `404 Not Found`: Project, board, or card not found.
+        ```json
+        {
+            "error": "Project, board, or card not found."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
+### DELETE `/api/cards/:project_id/:board_id/:card_id`
+Deletes a card.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+  - `board_id`: Board ID.
+  - `card_id`: Card ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Response:**
+    - `200 OK`: Card deleted successfully.
+        ```json
+        {
+            "message": "Card deleted successfully."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+        ```json
+        {
+            "error": "User is not assigned to this project."
+        }
+        ```
+    - `404 Not Found`: Project, board, or card not found.
+        ```json
+        {
+            "error": "Project, board, or card not found."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
 
 ## Route Files
 
 - `routes/auth.js`
+- `routes/cards.js`
 - `routes/project.js`
 - `routes/projectAssignments.js`
 - `routes/user.js`
