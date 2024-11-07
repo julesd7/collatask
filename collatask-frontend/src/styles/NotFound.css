@@ -1,7 +1,5 @@
 /* NotFound.css */
 
-@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@100;200;400&display=swap');
-
 .not-found-container {
     background-color: var(--background-color);
     color: var(--text-color);

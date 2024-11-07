@@ -1,3 +1,5 @@
+// Welcome.tsx
+
 import React from 'react';
 import '../styles/Welcome.css';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +11,7 @@ const Welcome: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSignUp = () => {
-    navigate('/register'); // Change '/signup' to your sign-up route
+    navigate('/register');
   };
 
   return (
