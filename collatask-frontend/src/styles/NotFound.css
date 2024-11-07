@@ -1,0 +1,49 @@
+/* NotFound.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@100;200;400&display=swap');
+
+.not-found-container {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.not-found-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    max-width: 1200px;
+    background-color: var(--card-background-color);
+    border-radius: 20px;
+    margin-top: 40px;
+    text-align: center;
+}
+
+.not-found-content h1 {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.not-found-content p {
+    padding-bottom: 20px;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.not-found-content .back-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    align-items: center;
+}
