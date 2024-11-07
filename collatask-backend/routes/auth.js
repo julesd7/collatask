@@ -9,7 +9,7 @@ const router = express.Router();
 // Function to generate a refresh token
 const generateRefreshToken = (userId, rememberMe) => {
     const refreshTokenExpiry = rememberMe ? '30d' : '7d';  
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: refreshTokenExpiry });
+    return jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: refreshTokenExpiry });
 };
 
 // Register route
@@ -105,7 +105,13 @@ router.post('/login', async (req, res) => {
         }
 
         const expiresIn = rememberMe ? '7d' : '1d';  // Access token expiry
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn });
+        const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn });
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+        });
 
         const refreshToken = generateRefreshToken(user.id, rememberMe);
 
@@ -116,7 +122,7 @@ router.post('/login', async (req, res) => {
         });
 
         res.status(200).json({
-            token: token,
+            message: 'Logged in successfully',
         });
     } catch (error) {
         console.error('Error logging in user', error);
@@ -133,14 +139,19 @@ router.post('/refresh-token', (req, res) => {
     }
 
     try {
-        jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, decoded) => {
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, decoded) => {
             if (err) {
                 return res.status(403).json({ error: 'Invalid refresh token' });
             }
 
             const newAccessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            res.cookie('accessToken', newAccessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+                maxAge: 1 * 24 * 60 * 60 * 1000,
+            });
 
-            res.status(200).json({ token: newAccessToken });
+            res.status(200).json({ message: 'Access token refreshed successfully' });
         });
     } catch (error) {
         console.error('Error refreshing token:', error);
@@ -175,6 +186,7 @@ router.get('/verify-email', async (req, res) => {
 router.post('/logout', (req, res) => {
     try {
         res.clearCookie('refreshToken');
+        res.clearCookie('accessToken');
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
         console.error('Error logging out:', error);
