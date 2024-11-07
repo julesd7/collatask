@@ -114,7 +114,7 @@ router.delete('/:project_id', authenticateJWT, async (req, res) => {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
 
-        const result = await pool.query('DELETE FROM projects WHERE id = $1 RETURNING *', [id]);
+        const result = await pool.query('DELETE FROM projects WHERE id = $1 RETURNING *', [project_id]);
 
         const deletedProject = result.rows[0];
         res.status(200).json({ message: 'Project deleted successfully', project: deletedProject });
