@@ -331,7 +331,9 @@ CREATE TABLE public.users (
     username character varying(50) NOT NULL,
     email character varying(100) NOT NULL,
     password character varying(255) NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    verified boolean DEFAULT false,
+    verification_token character varying(255)
 );
 
 
