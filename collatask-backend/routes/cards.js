@@ -6,7 +6,7 @@ const { roleMiddleware } = require('../middleware/roleMiddleware');
 const router = express.Router();
 
 // Endpoint to get all cards
-router.get('/:project_id/:board_id', authenticateJWT, roleMiddleware([],[]), async (req, res) => {
+router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
     const { project_id, board_id } = req.params;
 
     if (!project_id || !board_id) {
