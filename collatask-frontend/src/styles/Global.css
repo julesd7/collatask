@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@100;200;400&display=swap');
+
+:root {
+    --background-color: #1A103D;
+    --card-background-color: #2B1D56;
+    --text-color: #FFFFFF;
+    --accent-color: #8F7EE6;
+    --button-bg-color: #FFFFFF;
+    --button-text-color: #1A103D;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Sour Gummy', sans-serif;
+    font-weight: 200;
+  }
