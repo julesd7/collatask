@@ -140,37 +140,34 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.boards (
-    id integer NOT NULL,
-    project_id integer NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    title character varying(255)
+    title character varying(255),
+    project_id uuid
 );
 
 
 ALTER TABLE public.boards OWNER TO jules;
 
 --
--- Name: boards_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
+-- Name: cards; Type: TABLE; Schema: public; Owner: jules
 --
 
-CREATE SEQUENCE public.boards_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE TABLE public.cards (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    title character varying(100) NOT NULL,
+    description text,
+    start_date date,
+    end_date date,
+    last_change timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    board_id uuid,
+    project_id uuid,
+    assignees_ids uuid[]
+);
 
 
-ALTER TABLE public.boards_id_seq OWNER TO jules;
-
---
--- Name: boards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jules
---
-
-ALTER SEQUENCE public.boards_id_seq OWNED BY public.boards.id;
-
+ALTER TABLE public.cards OWNER TO jules;
 
 --
 -- Name: cards_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
@@ -188,106 +185,43 @@ CREATE SEQUENCE public.cards_id_seq
 ALTER TABLE public.cards_id_seq OWNER TO jules;
 
 --
--- Name: cards; Type: TABLE; Schema: public; Owner: jules
---
-
-CREATE TABLE public.cards (
-    id integer DEFAULT nextval('public.cards_id_seq'::regclass) NOT NULL,
-    title character varying(100) NOT NULL,
-    description text,
-    board_id integer NOT NULL,
-    project_id integer NOT NULL,
-    assignees_ids integer[],
-    start_date date,
-    end_date date,
-    last_change timestamp without time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
-ALTER TABLE public.cards OWNER TO jules;
-
---
 -- Name: project_assignments; Type: TABLE; Schema: public; Owner: jules
 --
 
 CREATE TABLE public.project_assignments (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    project_id integer NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     role character varying(20) DEFAULT 'viewer'::character varying,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    user_id uuid NOT NULL,
+    project_id uuid NOT NULL
 );
 
 
 ALTER TABLE public.project_assignments OWNER TO jules;
 
 --
--- Name: project_assignments_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
---
-
-CREATE SEQUENCE public.project_assignments_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.project_assignments_id_seq OWNER TO jules;
-
---
--- Name: project_assignments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jules
---
-
-ALTER SEQUENCE public.project_assignments_id_seq OWNED BY public.project_assignments.id;
-
-
---
 -- Name: projects; Type: TABLE; Schema: public; Owner: jules
 --
 
 CREATE TABLE public.projects (
-    id integer NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     name character varying(100) NOT NULL,
     description text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    owner_id integer NOT NULL
+    owner_id uuid
 );
 
 
 ALTER TABLE public.projects OWNER TO jules;
 
 --
--- Name: projects_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
---
-
-CREATE SEQUENCE public.projects_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.projects_id_seq OWNER TO jules;
-
---
--- Name: projects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jules
---
-
-ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
-
-
---
 -- Name: tasks; Type: TABLE; Schema: public; Owner: jules
 --
 
 CREATE TABLE public.tasks (
-    id integer NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     title character varying(100) NOT NULL,
     description text,
     status character varying(20) DEFAULT 'pending'::character varying,
@@ -301,33 +235,11 @@ CREATE TABLE public.tasks (
 ALTER TABLE public.tasks OWNER TO jules;
 
 --
--- Name: tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
---
-
-CREATE SEQUENCE public.tasks_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.tasks_id_seq OWNER TO jules;
-
---
--- Name: tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jules
---
-
-ALTER SEQUENCE public.tasks_id_seq OWNED BY public.tasks.id;
-
-
---
 -- Name: users; Type: TABLE; Schema: public; Owner: jules
 --
 
 CREATE TABLE public.users (
-    id integer NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     username character varying(50) NOT NULL,
     email character varying(100) NOT NULL,
     password character varying(255) NOT NULL,
@@ -338,63 +250,6 @@ CREATE TABLE public.users (
 
 
 ALTER TABLE public.users OWNER TO jules;
-
---
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
---
-
-CREATE SEQUENCE public.users_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.users_id_seq OWNER TO jules;
-
---
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: jules
---
-
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-
-
---
--- Name: boards id; Type: DEFAULT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.boards ALTER COLUMN id SET DEFAULT nextval('public.boards_id_seq'::regclass);
-
-
---
--- Name: project_assignments id; Type: DEFAULT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.project_assignments ALTER COLUMN id SET DEFAULT nextval('public.project_assignments_id_seq'::regclass);
-
-
---
--- Name: projects id; Type: DEFAULT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval('public.projects_id_seq'::regclass);
-
-
---
--- Name: tasks id; Type: DEFAULT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval('public.tasks_id_seq'::regclass);
-
-
---
--- Name: users id; Type: DEFAULT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
-
 
 --
 -- Name: boards boards_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
@@ -418,14 +273,6 @@ ALTER TABLE ONLY public.cards
 
 ALTER TABLE ONLY public.project_assignments
     ADD CONSTRAINT project_assignments_pkey PRIMARY KEY (id);
-
-
---
--- Name: project_assignments project_assignments_user_id_project_id_key; Type: CONSTRAINT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.project_assignments
-    ADD CONSTRAINT project_assignments_user_id_project_id_key UNIQUE (user_id, project_id);
 
 
 --
@@ -504,74 +351,59 @@ CREATE TRIGGER trigger_update_task_timestamp BEFORE UPDATE ON public.tasks FOR E
 
 
 --
--- Name: projects trigger_update_timestamp; Type: TRIGGER; Schema: public; Owner: jules
---
-
-CREATE TRIGGER trigger_update_timestamp BEFORE UPDATE ON public.projects FOR EACH ROW EXECUTE FUNCTION public.update_timestamp();
-
-
---
--- Name: boards boards_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.boards
-    ADD CONSTRAINT boards_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-
---
--- Name: cards cards_board_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: cards fk_board_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
 --
 
 ALTER TABLE ONLY public.cards
-    ADD CONSTRAINT cards_board_id_fkey FOREIGN KEY (board_id) REFERENCES public.boards(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_board_id FOREIGN KEY (board_id) REFERENCES public.boards(id);
 
 
 --
--- Name: cards cards_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.cards
-    ADD CONSTRAINT cards_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-
---
--- Name: projects fk_owner; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: projects fk_owner_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
 --
 
 ALTER TABLE ONLY public.projects
-    ADD CONSTRAINT fk_owner FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES public.users(id);
 
 
 --
--- Name: project_assignments project_assignments_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
---
-
-ALTER TABLE ONLY public.project_assignments
-    ADD CONSTRAINT project_assignments_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-
---
--- Name: project_assignments project_assignments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: project_assignments fk_project; Type: FK CONSTRAINT; Schema: public; Owner: jules
 --
 
 ALTER TABLE ONLY public.project_assignments
-    ADD CONSTRAINT project_assignments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 
 --
--- Name: tasks tasks_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: project_assignments fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
 --
 
-ALTER TABLE ONLY public.tasks
-    ADD CONSTRAINT tasks_assigned_to_fkey FOREIGN KEY (assigned_to) REFERENCES public.users(id) ON DELETE SET NULL;
+ALTER TABLE ONLY public.project_assignments
+    ADD CONSTRAINT fk_project_id FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 
 --
--- Name: tasks tasks_board_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: boards fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
 --
 
-ALTER TABLE ONLY public.tasks
-    ADD CONSTRAINT tasks_board_id_fkey FOREIGN KEY (board_id) REFERENCES public.boards(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.boards
+    ADD CONSTRAINT fk_project_id FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+
+--
+-- Name: cards fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
+--
+
+ALTER TABLE ONLY public.cards
+    ADD CONSTRAINT fk_project_id FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_assignments fk_user; Type: FK CONSTRAINT; Schema: public; Owner: jules
+--
+
+ALTER TABLE ONLY public.project_assignments
+    ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
