@@ -206,7 +206,7 @@ ALTER TABLE public.project_assignments OWNER TO jules;
 
 CREATE TABLE public.projects (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name character varying(100) NOT NULL,
+    title character varying(100) NOT NULL,
     description text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
@@ -355,7 +355,7 @@ CREATE TRIGGER trigger_update_task_timestamp BEFORE UPDATE ON public.tasks FOR E
 --
 
 ALTER TABLE ONLY public.cards
-    ADD CONSTRAINT fk_board_id FOREIGN KEY (board_id) REFERENCES public.boards(id);
+    ADD CONSTRAINT fk_board_id FOREIGN KEY (board_id) REFERENCES public.boards(id) ON DELETE CASCADE;
 
 
 --
