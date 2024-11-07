@@ -1,0 +1,132 @@
+/* Welcome.css */
+  
+.welcome-container {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.welcome-container .welcome-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  max-width: 1200px;
+  padding: 20px 0;
+}
+
+.welcome-container .header-logo {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+}
+
+.welcome-container .logo {
+  height: 40px;
+  cursor: pointer;
+}
+
+.welcome-container .logo-text {
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.welcome-container .nav-link {
+  color: var(--text-color);
+  margin-right: 20px;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.welcome-container .signup-button {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-container .signup-button .arrow {
+  margin-left: 5px;
+}
+
+.welcome-container .welcome-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  width: 90%;
+  max-width: 1200px;
+  background-color: var(--card-background-color);
+  border-radius: 20px;
+  margin-top: 40px;
+}
+
+.welcome-container .text-section {
+  flex: 1;
+}
+
+.welcome-container .tag {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  padding: 7px 10px;
+  border-radius: 15px;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.welcome-container .title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  font-weight: 400;
+}
+
+.welcome-container .description {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  font-weight: 100;
+  margin-right: 10px;
+}
+
+.welcome-container .start-button {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-container .start-button .arrow {
+  margin-left: 5px;
+}
+
+.welcome-container .image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-container .hero-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 50px;
+  clip-path: polygon(32% 0%,100% 0%,100% 71%,58% 100%,22% 100%,0% 56%,0% 41%);
+}
