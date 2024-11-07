@@ -11,17 +11,17 @@ const roleMiddleware = (requiredRoles = [], forbiddenRoles = []) => {
         );
 
         if (roleCheck.rowCount === 0) {
-            return res.status(403).json({ error: 'Forbidden access.' });
+            return res.status(403).json({ role: 'Forbidden access.' });
         }
 
         const userRole = roleCheck.rows[0].role;
 
         if (forbiddenRoles.includes(userRole)) {
-            return res.status(403).json({ error: 'Forbidden access.' });
+            return res.status(403).json({ role: 'Forbidden access.' });
         }
 
         if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
-            return res.status(403).json({ error: 'Forbidden access.' });
+            return res.status(403).json({ role: 'Forbidden access.' });
         }
 
         next();
