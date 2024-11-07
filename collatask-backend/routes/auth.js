@@ -106,7 +106,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Route for refreshing the access token
-router.get('/refresh-token', (req, res) => {
+router.post('/refresh-token', (req, res) => {
     const { refreshToken } = req.cookies;
 
     if (!refreshToken) {
@@ -125,6 +125,17 @@ router.get('/refresh-token', (req, res) => {
         });
     } catch (error) {
         console.error('Error refreshing token:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route for logging out
+router.post('/logout', (req, res) => {
+    try {
+        res.clearCookie('refreshToken');
+        res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+        console.error('Error logging out:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
