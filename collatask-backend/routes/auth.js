@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { pool } = require('../db');
+const nodemailer = require('nodemailer');
 const router = express.Router();
 
 // Function to generate a refresh token
@@ -11,9 +12,9 @@ const generateRefreshToken = (userId, rememberMe) => {
     return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: refreshTokenExpiry });
 };
 
-// Route for registration (register)
+// Register route
 router.post('/register', async (req, res) => {
-    const { username, email, password, rememberMe } = req.body;
+    const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
         return res.status(400).json({ error: 'All fields are required' });
@@ -30,34 +31,47 @@ router.post('/register', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
+        const verificationToken = jwt.sign({ email }, process.env.EMAIL_JWT_SECRET, { expiresIn: '1h' });
 
         const result = await pool.query(
-            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id',
-            [username, email, hashedPassword]
+            'INSERT INTO users (username, email, password, verified, verification_token) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [username, email, hashedPassword, false, verificationToken]
         );
 
         const userId = result.rows[0].id;
-        const expiresIn = rememberMe ? '7d' : '1d';  // Access token expiry
-        const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn });
 
-        const refreshToken = generateRefreshToken(userId, rememberMe);
-
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',  // Use HTTPS in production
-            maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 30 days or 7 days
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
         });
 
-        res.status(201).json({
-            message: 'User registered successfully.',
-            user_id: userId,
-            token: token,
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Please verify your email address',
+            text: `Click on the link to verify your email: ${process.env.APP_URL}/api/auth/verify-email?token=${verificationToken}`,
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.error('Error sending verification email', err);
+                return res.status(500).json({ error: 'Error sending email' });
+            }
+            return res.status(201).json({
+                message: 'User registered successfully. Please check your email to verify your account.',
+                user_id: userId,
+            });
         });
+
     } catch (error) {
         console.error('Error registering user', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 // Login route
 router.post('/login', async (req, res) => {
@@ -77,6 +91,11 @@ router.post('/login', async (req, res) => {
         if (!user) {
             console.error('User not found with identifier:', identifier);
             return res.status(401).json({ error: 'Invalid credentials.' });
+        }
+
+        if (!user.verified) {
+            console.error('User has not verified their email:', user.username);
+            return res.status(403).json({ error: 'Please verify your email before logging in.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -126,6 +145,29 @@ router.post('/refresh-token', (req, res) => {
     } catch (error) {
         console.error('Error refreshing token:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route for verifying email
+router.get('/verify-email', async (req, res) => {
+    const { token } = req.query;
+
+    try {
+        const decoded = jwt.verify(token, process.env.EMAIL_JWT_SECRET);
+
+        const user = await pool.query('SELECT * FROM users WHERE email = $1 AND verification_token = $2', 
+            [decoded.email, token]);
+
+        if (user.rows.length === 0) {
+            return res.status(400).json({ error: 'Invalid or expired verification token.' });
+        }
+
+        await pool.query('UPDATE users SET verified = $1, verification_token = $2 WHERE email = $3', 
+            [true, null, decoded.email]);
+
+        return res.status(200).json({ message: 'Email verified successfully. You can now log in.' });
+    } catch (err) {
+        return res.status(400).json({ error: 'Invalid or expired verification token.' });
     }
 });
 

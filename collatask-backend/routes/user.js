@@ -12,6 +12,7 @@ router.get('/me', authenticateJWT, (req, res) => {
         id: req.user.id,
         username: req.user.username,
         email: req.user.email,
+        verified: req.user.verified,
         created_at: req.user.created_at,
     });
 });
