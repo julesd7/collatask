@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 // Import the routes
 const authRoutes = require('./routes/auth');
@@ -13,6 +14,11 @@ const cardAssignmentRoutes = require('./routes/cardAssignments');
 const boardRoutes = require('./routes/boards');
 
 const app = express();
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  }));
 
 // Middleware
 app.use(bodyParser.json());
