@@ -7,17 +7,17 @@ const { authenticateJWT } = require('../middleware/authMiddleware');
 
 // Route to create a new project
 router.post('/', authenticateJWT, async (req, res) => {
-    const { name, description } = req.body;
+    const { title, description } = req.body;
     const ownerId = req.user.id;
 
-    if (!name) {
-        return res.status(400).json({ error: 'Project name is required' });
+    if (!title) {
+        return res.status(400).json({ error: 'Project title is required' });
     }
 
     try {
         const result = await pool.query(
-            'INSERT INTO projects (name, description, owner_id) VALUES ($1, $2, $3) RETURNING id',
-            [name, description, ownerId]
+            'INSERT INTO projects (title, description, owner_id) VALUES ($1, $2, $3) RETURNING id',
+            [title, description, ownerId]
         );
 
         const newProjectId = result.rows[0].id;
@@ -37,7 +37,7 @@ router.post('/', authenticateJWT, async (req, res) => {
 // Route to edit a project
 router.put('/:project_id', authenticateJWT, async (req, res) => {
     const { project_id } = req.params;
-    const { name, description } = req.body;
+    const { title, description } = req.body;
     const userId = req.user.id;
 
     try {
@@ -58,9 +58,9 @@ router.put('/:project_id', authenticateJWT, async (req, res) => {
         const updates = [];
         const values = [];
 
-        if (name) {
-            updates.push(`name = $${updates.length + 1}`);
-            values.push(name);
+        if (title) {
+            updates.push(`title = $${updates.length + 1}`);
+            values.push(title);
         }
         if (description) {
             updates.push(`description = $${updates.length + 1}`);
