@@ -10,7 +10,7 @@ router.get('/', authenticateJWT, async (req, res) => {
 
     try {
         const result = await pool.query(`
-            SELECT p.id AS project_id, p.name, p.description
+            SELECT p.id AS project_id, p.title, p.description
             FROM projects p
             INNER JOIN project_assignments pa ON pa.project_id = p.id
             WHERE pa.user_id = $1
