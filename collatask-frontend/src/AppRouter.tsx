@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import axios from 'axios';
 
 import Home from './pages/Home';
 import Welcome from './pages/Welcome';
@@ -15,11 +16,30 @@ const AppRouter: React.FC = () => {
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        const response = await fetch(`${process.env.APP_URL}/api/user/me`, {
-          credentials: 'include',
-        });
+        await axios.post(
+          `${import.meta.env.VITE_APP_URL}/api/auth/login`, 
+          {
+            identifier: 'jules', 
+            password: 'password',
+            rememberMe: true
+          },
+          {
+            withCredentials: true,
+          }
+      );
+      } catch (error) {
+        setIsConnected(false);
+      }
+      try {
+          const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/user/me`, {
+            withCredentials: true,
+          });
 
-        setIsConnected(response.status === 200);
+          if (response.status === 200) {
+            setIsConnected(true);
+          } else if (response.status === 401 || response.status === 403) {
+            setIsConnected(false);
+          }
       } catch (error) {
         setIsConnected(false);
       }
