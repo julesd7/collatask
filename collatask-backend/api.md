@@ -839,10 +839,201 @@ Deletes a card.
         }
         ```
 
+## Card Assignments
+
+### GET `/api/cards-assignments/:card_id`
+Retrieves users assigned to a card.
+
+- **Request Parameters:**
+  - `card_id`: Card ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Response:**
+    - `200 OK`: List of users.
+        ```json
+        [
+            {
+                "assignees_ids": [
+                    id,
+                    id
+                ]
+            }
+        ]
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+    - `404 Not Found`: Card not found.
+        ```json
+        {
+            "error": "Card not found."
+        }
+        ```
+        ```json
+        {
+            "error": "No card assignments found for this card."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
+### POST `/api/cards-assignments/:project_id/:card_id`
+Assigns a user to a card.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+  - `card_id`: Card ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Request Body:**
+    ```json
+    {
+        "user_id": id
+    }
+    ```
+
+- **Response:**
+    - `201 Created`: User assigned successfully.
+        ```json
+        {
+            "message": "User assigned successfully."
+        }
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+        ```json
+        {
+            "error": "User is not assigned to this project."
+        }
+        ```
+    - `404 Not Found`: Project or card not found.
+        ```json
+        {
+            "error": "Project or card not found."
+        }
+        ```
+    - `409 Conflict`: User already assigned to this card.
+        ```json
+        {
+            "error": "User already assigned to this card."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
+### DELETE `/api/cards-assignments/:project_id/:card_id`
+Removes a user from a card.
+
+- **Request Parameters:**
+  - `project_id`: Project ID.
+  - `card_id`: Card ID.
+
+- **Headers:**
+    - `Authorization`: Bearer _token_.
+
+- **Request Body:**
+    ```json
+    {
+        "user_id": id
+    }
+    ```
+
+- **Response:**
+    - `200 OK`: User removed successfully.
+        ```json
+        {
+            "message": "User removed successfully."
+        }
+        ```
+    - `400 Bad Request`: Missing information.
+        ```json
+        {
+            "error": "Missing information."
+        }
+        ```
+    - `401 Unauthorized`: Missing token.
+        ```json
+        {
+            "error": "Unauthorized access."
+        }
+        ```
+    - `403 Forbidden`: Invalid token.
+        ```json
+        {
+            "error": "Forbidden access."
+        }
+        ```
+        ```json
+        {
+            "error": "User is not assigned to this project."
+        }
+        ```
+    - `404 Not Found`: Project or card not found.
+        ```json
+        {
+            "error": "Project or card not found."
+        }
+        ```
+        ```json
+        {
+            "error": "User not assigned to this card."
+        }
+        ```
+    - `500 Internal Server Error`: Server error.
+        ```json
+        {
+            "error": "Internal server error."
+        }
+        ```
+
 ## Route Files
 
 - `routes/auth.js`
 - `routes/cards.js`
+- `routes/cardsAssignments.js`
 - `routes/project.js`
 - `routes/projectAssignments.js`
 - `routes/user.js`
