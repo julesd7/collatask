@@ -1,12 +1,14 @@
-// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
+
+// Import the routes
 const authRoutes = require('./routes/auth');
 const accountRoutes = require('./routes/user');
 const projectRoutes = require('./routes/project');
 const projectAssignmentRoutes = require('./routes/projectAssignments');
 const userBoardsRoutes = require('./routes/userProjects');
 const cardRoutes = require('./routes/cards');
+const cardAssignmentRoutes = require('./routes/cardAssignments');
 
 const app = express();
 
@@ -20,6 +22,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/project-assignments', projectAssignmentRoutes);
 app.use('/api/user-projects', userBoardsRoutes);
 app.use('/api/cards', cardRoutes);
+app.use('/api/card-assignments', cardAssignmentRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
