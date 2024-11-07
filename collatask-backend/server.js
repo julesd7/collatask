@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 // Import the routes
 const authRoutes = require('./routes/auth');
@@ -14,6 +15,7 @@ const app = express();
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
