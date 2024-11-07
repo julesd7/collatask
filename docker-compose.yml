@@ -17,6 +17,7 @@ services:
       - EMAIL_USER=${EMAIL_USER}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - EMAIL_JWT_SECRET=${EMAIL_JWT_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
     depends_on:
       - db
 
@@ -26,6 +27,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    environment:
+      - VITE_APP_URL=${VITE_APP_URL}
 
   db:
     image: postgres:latest
