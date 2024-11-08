@@ -41,12 +41,14 @@ router.post('/register', async (req, res) => {
         const userId = result.rows[0].id;
 
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.zoho.eu',
+            port: 465,
+            secure: true,
             auth: {
                 user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                pass: process.env.EMAIL_PASSWORD,
             },
-        });
+        });        
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
