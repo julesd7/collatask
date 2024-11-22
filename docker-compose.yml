@@ -6,6 +6,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - PORT=${PORT}
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
