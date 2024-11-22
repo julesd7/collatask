@@ -1,7 +1,7 @@
 // src/AppRouter.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 import Home from './pages/Home';
@@ -10,6 +10,9 @@ import About from './pages/About';
 import NotFound from './pages/NotFound';
 import Fordidden from './pages/Forbidden';
 
+import Signup from './pages/Signup';
+import Login from './pages/Login';
+
 import './styles/Global.css';
 
 const AppRouter: React.FC = () => {
@@ -17,21 +20,6 @@ const AppRouter: React.FC = () => {
 
   useEffect(() => {
     const checkConnection = async () => {
-      try {
-        await axios.post(
-          `${import.meta.env.VITE_APP_URL}/api/auth/login`, 
-          {
-            identifier: 'jules', 
-            password: 'password',
-            rememberMe: true
-          },
-          {
-            withCredentials: true,
-          }
-      );
-      } catch (error) {
-        setIsConnected(false);
-      }
       try {
           const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/user/me`, {
             withCredentials: true,
@@ -58,6 +46,8 @@ const AppRouter: React.FC = () => {
     <Routes>
       <Route path="/" element={isConnected ? <Home /> : <Welcome />} />
       <Route path="/about" element={<About />} />
+      <Route path="signup" element={isConnected ? <Navigate to="/" /> : <Signup />} />
+      <Route path="/login" element={isConnected ? <Navigate to="/" /> : <Login />} />
       <Route path="/forbidden" element={<Fordidden />} />
 
       <Route path='*' element={<NotFound />} />
