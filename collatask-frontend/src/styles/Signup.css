@@ -1,0 +1,134 @@
+/* Signup.css */
+
+.signup-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 0 20px;
+    position: relative;
+    background-color: var(--background-color);
+}
+
+.signup-container .logo-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: -75px;
+}
+
+.signup-container .logo-container {
+    background-color: var(--card-background-color);
+    border-radius: 50%;
+    padding: 20px;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+}
+
+.signup-container .logo {
+    width: 140px;
+    height: auto;
+}
+
+.signup-container .signup-content {
+    background-color: var(--card-background-color);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.signup-container h1 {
+    color: var(--text-color);
+    font-size: 34px;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.signup-container input[type='text'],
+.signup-container input[type='password'],
+.signup-container input[type='email'] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+}
+
+.signup-container input[type='text']:focus,
+.signup-container input[type='password']:focus,
+.signup-container input[type='email']:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.signup-container button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.signup-container button:hover {
+    background-color: var(--accent-color);
+}
+
+.signup-container .remember-me-container {
+    color: var(--text-color);
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.signup-container .remember-me-container label {
+    display: flex;
+    align-items: center;
+}
+
+.signup-container .forget-password {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.signup-container .remember-me-container input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.signup-container .swap-link {
+    color: var(--text-color);
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.signup-container .swap-link span:hover {
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+.signup-container .error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+}
