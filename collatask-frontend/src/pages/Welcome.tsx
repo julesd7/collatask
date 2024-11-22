@@ -11,7 +11,7 @@ const Welcome: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSignUp = () => {
-    navigate('/register');
+    navigate('/signup');
   };
 
   return (
