@@ -17,7 +17,7 @@ const Welcome: React.FC = () => {
   return (
     <div className="welcome-container">
       <header className="welcome-header">
-        <div className='header-logo'>
+        <div className='header-logo' onClick={() => navigate('/')}>
             <img src={Logo} alt="Collatask Logo" className="logo" />
             <p className='logo-text'>Collatask</p>
         </div>
