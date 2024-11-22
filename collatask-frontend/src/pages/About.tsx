@@ -50,7 +50,7 @@ const Welcome: React.FC = () => {
             <p className="description">
                 Collatask is more than just a tool; it’s a community. Join us to organize your projects, boost your productivity, and achieve your goals.
             </p>
-            <button className='signup-button' onClick={() => navigate('/register')}>Sign up <span className="arrow">→</span></button>
+            <button className='signup-button' onClick={() => navigate('/signup')}>Sign up <span className="arrow">→</span></button>
         </div>
       </div>
     </div>
