@@ -6,7 +6,9 @@ import axios from 'axios';
 
 import Home from './pages/Home';
 import Welcome from './pages/Welcome';
+import About from './pages/About';
 import NotFound from './pages/NotFound';
+import Fordidden from './pages/Forbidden';
 
 import './styles/Global.css';
 
@@ -55,6 +57,8 @@ const AppRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={isConnected ? <Home /> : <Welcome />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/forbidden" element={<Fordidden />} />
 
       <Route path='*' element={<NotFound />} />
     </Routes>
