@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Auth.css';
 
@@ -23,15 +23,20 @@ const Login: React.FC = () => {
                 rememberMe,
             };
 
-            await axios.post(
+            const response = await axios.post(
                 `${import.meta.env.VITE_APP_URL}/api/auth/login`,
                 requestBody,
                 {
                     withCredentials: true,
                 }
             );
-
-            navigate('/');
+            
+            if (response.status === 200) {
+                setTimeout(() => {
+                    navigate('/');
+                    window.location.reload();
+                }, 500);
+            }
 
         } catch (error) {
             const errorMessage = (error as any).response?.data?.message || 'An error occurred.';
