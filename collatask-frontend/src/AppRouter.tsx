@@ -47,7 +47,7 @@ const AppRouter: React.FC = () => {
     <Routes>
       <Route path="/" element={isConnected ? <Home /> : <Welcome />} />
       <Route path="/about" element={<About />} />
-      <Route path="signup" element={isConnected ? <Navigate to="/" /> : <Signup />} />
+      <Route path="/signup" element={isConnected ? <Navigate to="/" /> : <Signup />} />
       <Route path="/login" element={isConnected ? <Navigate to="/" /> : <Login />} />
       <Route path="/reset" element={isConnected ? <Navigate to="/" /> : <Reset />} />
       <Route path="/forbidden" element={<Fordidden />} />
