@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/Signup.css';
+import '../styles/Auth.css';
 
 import Logo from '../assets/logo_white_500x500.png';
 
@@ -13,11 +13,13 @@ const Signup: React.FC = () => {
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [email, setEmail] = useState<string>('');
+    const [success, setSuccess] = useState<string>('');
     const [error, setError] = useState<string>('');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        setError('');
         e.preventDefault();
+        setSuccess('');
+        setError('');
     
         if (password !== confirmPassword) {
             setError('Passwords do not match.');
@@ -40,7 +42,7 @@ const Signup: React.FC = () => {
             );
             
             const successMessage = 'Email sent. You will be redirected to the login page in 5 seconds.';
-            setError(successMessage);
+            setSuccess(successMessage);
 
             setTimeout(() => {
                 navigate('/login');
@@ -62,7 +64,7 @@ const Signup: React.FC = () => {
         <div className='signup-container'>
             <div className='logo-wrapper'>
                 <div className='logo-container'>
-                    <img src={Logo} alt='Logo' className='logo' />
+                    <img src={Logo} alt='Logo' className='logo' onClick={() => navigate('/')} />
                 </div>
             </div>
             <div className='signup-content'>
@@ -97,6 +99,7 @@ const Signup: React.FC = () => {
                         <p>Already have an account? <span onClick={() => navigate('/login')}>Sign in</span></p>
                     </div>
                 </form>
+                {success && <p className="success-message">{success}</p>}
                 {error && <p className='error-message'>{error}</p>}
             </div>
         </div>
