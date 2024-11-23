@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/Signup.css';
+import '../styles/Auth.css';
 
 import Logo from '../assets/logo_white_500x500.png';
 
@@ -13,8 +13,8 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string>('');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        setError('');
         e.preventDefault();
+        setError('');
     
         try {
             const requestBody: any = {
@@ -49,7 +49,7 @@ const Login: React.FC = () => {
         <div className='signup-container'>
             <div className='logo-wrapper'>
                 <div className='logo-container'>
-                    <img src={Logo} alt='Logo' className='logo' />
+                    <img src={Logo} alt='Logo' className='logo' onClick={() => navigate('/')} />
                 </div>
             </div>
             <div className='signup-content'>
@@ -77,7 +77,7 @@ const Login: React.FC = () => {
                             />
                             Remember Me
                         </label>
-                        <label className="forget-password">
+                        <label className="forget-password" onClick={() => navigate('/reset')}>
                             Forget password?
                         </label>
                     </div>
