@@ -17,7 +17,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: assign_user_to_project(integer, integer, character varying); Type: FUNCTION; Schema: public; Owner: jules
+-- Name: assign_user_to_project(integer, integer, character varying); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.assign_user_to_project(p_user_id integer, p_project_id integer, p_role character varying DEFAULT 'member'::character varying) RETURNS void
@@ -31,10 +31,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.assign_user_to_project(p_user_id integer, p_project_id integer, p_role character varying) OWNER TO jules;
-
 --
--- Name: create_default_boards(); Type: FUNCTION; Schema: public; Owner: jules
+-- Name: create_default_boards(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.create_default_boards() RETURNS trigger
@@ -49,10 +47,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.create_default_boards() OWNER TO jules;
-
 --
--- Name: update_board_timestamp(); Type: FUNCTION; Schema: public; Owner: jules
+-- Name: update_board_timestamp(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.update_board_timestamp() RETURNS trigger
@@ -65,10 +61,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_board_timestamp() OWNER TO jules;
-
 --
--- Name: update_card_last_change(); Type: FUNCTION; Schema: public; Owner: jules
+-- Name: update_card_last_change(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.update_card_last_change() RETURNS trigger
@@ -81,10 +75,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_card_last_change() OWNER TO jules;
-
 --
--- Name: update_task_timestamp(); Type: FUNCTION; Schema: public; Owner: jules
+-- Name: update_task_timestamp(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.update_task_timestamp() RETURNS trigger
@@ -97,10 +89,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_task_timestamp() OWNER TO jules;
-
 --
--- Name: update_timestamp(); Type: FUNCTION; Schema: public; Owner: jules
+-- Name: update_timestamp(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.update_timestamp() RETURNS trigger
@@ -113,10 +103,8 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_timestamp() OWNER TO jules;
-
 --
--- Name: update_updated_at(); Type: FUNCTION; Schema: public; Owner: jules
+-- Name: update_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.update_updated_at() RETURNS trigger
@@ -129,14 +117,12 @@ END;
 $$;
 
 
-ALTER FUNCTION public.update_updated_at() OWNER TO jules;
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: boards; Type: TABLE; Schema: public; Owner: jules
+-- Name: boards; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.boards (
@@ -148,10 +134,8 @@ CREATE TABLE public.boards (
 );
 
 
-ALTER TABLE public.boards OWNER TO jules;
-
 --
--- Name: cards; Type: TABLE; Schema: public; Owner: jules
+-- Name: cards; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.cards (
@@ -167,10 +151,8 @@ CREATE TABLE public.cards (
 );
 
 
-ALTER TABLE public.cards OWNER TO jules;
-
 --
--- Name: cards_id_seq; Type: SEQUENCE; Schema: public; Owner: jules
+-- Name: cards_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.cards_id_seq
@@ -182,10 +164,8 @@ CREATE SEQUENCE public.cards_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.cards_id_seq OWNER TO jules;
-
 --
--- Name: project_assignments; Type: TABLE; Schema: public; Owner: jules
+-- Name: project_assignments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.project_assignments (
@@ -198,10 +178,8 @@ CREATE TABLE public.project_assignments (
 );
 
 
-ALTER TABLE public.project_assignments OWNER TO jules;
-
 --
--- Name: projects; Type: TABLE; Schema: public; Owner: jules
+-- Name: projects; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.projects (
@@ -214,10 +192,8 @@ CREATE TABLE public.projects (
 );
 
 
-ALTER TABLE public.projects OWNER TO jules;
-
 --
--- Name: tasks; Type: TABLE; Schema: public; Owner: jules
+-- Name: tasks; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.tasks (
@@ -232,10 +208,8 @@ CREATE TABLE public.tasks (
 );
 
 
-ALTER TABLE public.tasks OWNER TO jules;
-
 --
--- Name: users; Type: TABLE; Schema: public; Owner: jules
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users (
@@ -245,14 +219,13 @@ CREATE TABLE public.users (
     password character varying(255) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     verified boolean DEFAULT false,
-    verification_token character varying(255)
+    verification_token character varying(255),
+    reset_token character varying(255)
 );
 
 
-ALTER TABLE public.users OWNER TO jules;
-
 --
--- Name: boards boards_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: boards boards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.boards
@@ -260,7 +233,7 @@ ALTER TABLE ONLY public.boards
 
 
 --
--- Name: cards cards_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: cards cards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.cards
@@ -268,7 +241,7 @@ ALTER TABLE ONLY public.cards
 
 
 --
--- Name: project_assignments project_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: project_assignments project_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_assignments
@@ -276,7 +249,7 @@ ALTER TABLE ONLY public.project_assignments
 
 
 --
--- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.projects
@@ -284,7 +257,7 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.tasks
@@ -292,7 +265,7 @@ ALTER TABLE ONLY public.tasks
 
 
 --
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -300,7 +273,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -308,7 +281,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: jules
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -316,42 +289,42 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: project_assignments set_updated_at; Type: TRIGGER; Schema: public; Owner: jules
+-- Name: project_assignments set_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.project_assignments FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
 
 
 --
--- Name: projects trigger_create_default_boards; Type: TRIGGER; Schema: public; Owner: jules
+-- Name: projects trigger_create_default_boards; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trigger_create_default_boards AFTER INSERT ON public.projects FOR EACH ROW EXECUTE FUNCTION public.create_default_boards();
 
 
 --
--- Name: boards trigger_update_board_timestamp; Type: TRIGGER; Schema: public; Owner: jules
+-- Name: boards trigger_update_board_timestamp; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trigger_update_board_timestamp BEFORE UPDATE ON public.boards FOR EACH ROW EXECUTE FUNCTION public.update_board_timestamp();
 
 
 --
--- Name: cards trigger_update_card_last_change; Type: TRIGGER; Schema: public; Owner: jules
+-- Name: cards trigger_update_card_last_change; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trigger_update_card_last_change BEFORE UPDATE ON public.cards FOR EACH ROW EXECUTE FUNCTION public.update_card_last_change();
 
 
 --
--- Name: tasks trigger_update_task_timestamp; Type: TRIGGER; Schema: public; Owner: jules
+-- Name: tasks trigger_update_task_timestamp; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER trigger_update_task_timestamp BEFORE UPDATE ON public.tasks FOR EACH ROW EXECUTE FUNCTION public.update_task_timestamp();
 
 
 --
--- Name: cards fk_board_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: cards fk_board_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.cards
@@ -359,7 +332,7 @@ ALTER TABLE ONLY public.cards
 
 
 --
--- Name: projects fk_owner_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: projects fk_owner_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.projects
@@ -367,7 +340,7 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- Name: project_assignments fk_project; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: project_assignments fk_project; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_assignments
@@ -375,7 +348,7 @@ ALTER TABLE ONLY public.project_assignments
 
 
 --
--- Name: project_assignments fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: project_assignments fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_assignments
@@ -383,7 +356,7 @@ ALTER TABLE ONLY public.project_assignments
 
 
 --
--- Name: boards fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: boards fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.boards
@@ -391,7 +364,7 @@ ALTER TABLE ONLY public.boards
 
 
 --
--- Name: cards fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: cards fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.cards
@@ -399,7 +372,7 @@ ALTER TABLE ONLY public.cards
 
 
 --
--- Name: project_assignments fk_user; Type: FK CONSTRAINT; Schema: public; Owner: jules
+-- Name: project_assignments fk_user; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_assignments
