@@ -9,6 +9,7 @@ import Welcome from './pages/Welcome';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
 import Fordidden from './pages/Forbidden';
+import Reset from './pages/Reset';
 
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -48,6 +49,7 @@ const AppRouter: React.FC = () => {
       <Route path="/about" element={<About />} />
       <Route path="signup" element={isConnected ? <Navigate to="/" /> : <Signup />} />
       <Route path="/login" element={isConnected ? <Navigate to="/" /> : <Login />} />
+      <Route path="/reset" element={isConnected ? <Navigate to="/" /> : <Reset />} />
       <Route path="/forbidden" element={<Fordidden />} />
 
       <Route path='*' element={<NotFound />} />
