@@ -161,6 +161,108 @@ router.post('/refresh-token', (req, res) => {
     }
 });
 
+// Route for password reset
+router.post('/reset', async (req, res) => {
+    const { identifier } = req.body;
+
+    if (!identifier) {
+        return res.status(400).json({ error: 'Identifier (email or username) is required.' });
+    }
+
+    try {
+        const result = await pool.query(
+            'SELECT * FROM users WHERE username = $1 OR email = $2',
+            [identifier, identifier]
+        );
+        const user = result.rows[0];
+
+        if (!user) {
+            console.error('No user found with identifier:', identifier);
+            return res.status(404).json({ error: 'No user found with the provided identifier.' });
+        }
+
+        if (!user.verified) {
+            console.error('User has not verified their email:', user.username);
+            return res.status(403).json({ error: 'Please verify your email before requesting a password reset.' });
+        }
+
+        const resetToken = jwt.sign({ id: user.id, email: user.email }, process.env.RESET_JWT_SECRET, { expiresIn: '1h' });
+
+        await pool.query(
+            'UPDATE users SET reset_token = $1 WHERE id = $2',
+            [resetToken, user.id]
+        );
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.zoho.eu',
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: 'Password Reset Request',
+            text: `Click on the link to reset your password: ${process.env.FRONTEND_URL}/reset?token=${resetToken}`,
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.error('Error sending password reset email:', err);
+                return res.status(500).json({ error: 'Error sending reset email.' });
+            }
+            return res.status(200).json({ message: 'Password reset email sent successfully.' });
+        });
+
+    } catch (error) {
+        console.error('Error processing password reset request:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+// Route to handle resetting the password after the email link is clicked
+router.post('/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+        return res.status(400).json({ error: 'Token and new password are required.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.RESET_JWT_SECRET);
+
+        const result = await pool.query(
+            'SELECT * FROM users WHERE id = $1 AND reset_token = $2',
+            [decoded.id, token]
+        );
+        const user = result.rows[0];
+
+        if (!user) {
+            console.error('Invalid or expired reset token:', token);
+            return res.status(401).json({ error: 'Invalid or expired reset token.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await pool.query(
+            'UPDATE users SET password = $1, reset_token = $2 WHERE id = $3',
+            [hashedPassword, null, user.id]
+        );
+
+        return res.status(200).json({ message: 'Password reset successfully.' });
+    } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Reset token has expired.' });
+        }
+        console.error('Error resetting password:', err);
+        return res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 // Route for verifying email
 router.get('/verify-email', async (req, res) => {
     const { token } = req.query;
