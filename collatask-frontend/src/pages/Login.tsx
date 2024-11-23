@@ -35,7 +35,7 @@ const Login: React.FC = () => {
                 setTimeout(() => {
                     navigate('/');
                     window.location.reload();
-                }, 500);
+                }, 200);
             }
 
         } catch (error) {
