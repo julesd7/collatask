@@ -11,6 +11,8 @@ import NotFound from './pages/NotFound';
 import Fordidden from './pages/Forbidden';
 import Reset from './pages/Reset';
 
+import CreateProject from './pages/CreateProject';
+
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 
@@ -51,6 +53,8 @@ const AppRouter: React.FC = () => {
       <Route path="/login" element={isConnected ? <Navigate to="/" /> : <Login />} />
       <Route path="/reset" element={isConnected ? <Navigate to="/" /> : <Reset />} />
       <Route path="/forbidden" element={<Fordidden />} />
+
+      <Route path="/create-project" element={isConnected ? <CreateProject /> : <Navigate to="/forbidden" />} />
 
       <Route path='*' element={<NotFound />} />
     </Routes>
