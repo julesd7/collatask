@@ -7,7 +7,7 @@ const router = express.Router();
 // Assign project to user
 router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
     const { project_id } = req.params;
-    const { user_id, role } = req.body;
+    const { email, role } = req.body;
     const requesterId = req.user.id;
 
     const projectCheck = await pool.query(
@@ -19,11 +19,22 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
         return res.status(404).json({ error: 'Project not found' });
     }
 
-    if (!user_id || !project_id) {
+    if (!email || !project_id) {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
     try {
+        const userCheck = await pool.query(
+            'SELECT id FROM users WHERE email = $1',
+            [email]
+        );
+
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user_id = userCheck.rows[0].id;
+
         const roleCheck = await pool.query(
             'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
             [requesterId, project_id]
