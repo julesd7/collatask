@@ -1,0 +1,138 @@
+/* ProjectCreator.css */
+
+.project-creator-container {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+}
+
+.project-creator-title {
+  position: absolute;
+  top: -45px;
+  left: 0;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  color: var(--text-color);
+  background-color: var(--card-background-color);
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.project-creator-content {
+  background-color: var(--card-background-color);
+  width: 90%;
+  max-width: 600px;
+  border-radius: 15px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.project-creator-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-creator-content input[type="text"],
+.project-creator-content input[type="email"],
+.project-creator-content select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: 16px;
+  outline: none;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+.project-creator-content .team-member {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 10px;
+  align-items: center;
+  background-color: var(--background-color);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  width: 100%;
+}
+
+.project-creator-content .team-member input,
+.project-creator-content .team-member select {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: 16px;
+  outline: none;
+}
+
+.project-creator-content .team-member select {
+  flex: 0.4;
+}
+
+.project-creator-content .remove-member {
+  color: #fff;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.project-creator-content .remove-member:hover {
+  background-color: #ff4b4b;
+}
+
+.project-creator-content .error-message {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.project-creator-content button {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.project-creator-content button:hover {
+  transform: scale(1.05);
+  background-color: #a08cf3;
+}
+
+.project-creator-content .add-member-button {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
