@@ -16,11 +16,13 @@ const Reset: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleIDSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         setSuccess('');
+        setIsLoading(true);
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_APP_URL}/api/auth/reset`, {
@@ -40,6 +42,8 @@ const Reset: React.FC = () => {
             } else {
                 setError('Internal error. Please try again.');
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -47,9 +51,11 @@ const Reset: React.FC = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
+        setIsLoading(true);
 
         if (password !== confirmPassword) {
             setError('Passwords do not match.');
+            setIsLoading(false);
             return;
         }
 
@@ -73,6 +79,8 @@ const Reset: React.FC = () => {
             } else {
                 setError('Internal error. Please try again.');
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -102,7 +110,13 @@ const Reset: React.FC = () => {
                                 required
                             />
                         </div>
-                        <button type="submit">Request password reset</button>
+                        <button type="submit" disabled={isLoading}>
+                            {isLoading ? (
+                                <div className="spinner"></div>
+                            ) : (
+                                'Request password reset'
+                            )}
+                        </button>
                     </form>
                 ) : (
                     <form onSubmit={handlePasswordSubmit}>
@@ -124,7 +138,13 @@ const Reset: React.FC = () => {
                                 required
                             />
                         </div>
-                        <button type="submit">Reset Password</button>
+                        <button type="submit" disabled={isLoading}>
+                            {isLoading ? (
+                                <div className="spinner"></div> // Show spinner
+                            ) : (
+                                'Reset Password'
+                            )}
+                        </button>
                     </form>
                 )}
 

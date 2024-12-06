@@ -15,14 +15,17 @@ const Signup: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
     const [error, setError] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSuccess('');
         setError('');
+        setIsLoading(true);
     
         if (password !== confirmPassword) {
             setError('Passwords do not match.');
+            setIsLoading(false);
             return;
         }
     
@@ -57,6 +60,8 @@ const Signup: React.FC = () => {
             } else {
                 setError(errorMessage);
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -94,7 +99,13 @@ const Signup: React.FC = () => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
-                    <button type='submit'>Sign Up</button>
+                    <button type='submit' disabled={isLoading}>
+                        {isLoading ? (
+                            <div className="spinner"></div>
+                        ) : (
+                            'Sign Up'
+                        )}
+                    </button>
                     <div className="swap-link">
                         <p>Already have an account? <span onClick={() => navigate('/login')}>Sign in</span></p>
                     </div>
@@ -103,7 +114,7 @@ const Signup: React.FC = () => {
                 {error && <p className='error-message'>{error}</p>}
             </div>
         </div>
-    );      
+    );
 }
 
 export default Signup;

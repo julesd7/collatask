@@ -1,3 +1,5 @@
+// Login.tsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,11 +12,13 @@ const Login: React.FC = () => {
     const [identifier, setIdentifier] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [rememberMe, setRememberMe] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
+        setIsLoading(true);
     
         try {
             const requestBody: any = {
@@ -47,6 +51,8 @@ const Login: React.FC = () => {
             } else {
                 setError(errorMessage);
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -72,7 +78,13 @@ const Login: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <button type='submit'>Login</button>
+                    <button type='submit' disabled={isLoading}>
+                        {isLoading ? (
+                            <div className="spinner"></div>
+                        ) : (
+                            'Login'
+                        )}
+                    </button>
                     <div className="remember-me-container">
                         <label>
                             <input
@@ -93,7 +105,7 @@ const Login: React.FC = () => {
                 {error && <p className='error-message'>{error}</p>}
             </div>
         </div>
-    );      
+    );
 }
 
 export default Login;
