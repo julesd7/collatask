@@ -1,0 +1,125 @@
+/* Project Container */
+.project-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    font-family: 'Sour Gummy', sans-serif;
+    background-color: var(--background-color);
+    min-height: 100vh;
+  }
+  
+  /* Title of the Project */
+  .project-container .title {
+    text-align: center;
+    font-size: 32px;
+    color: var(--text-color);
+    margin-bottom: 20px;
+  }
+  
+  /* Container for the Boards */
+  .project-container .boards-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 20px 0;
+    justify-content: flex-start;
+  }
+  
+  /* Individual Board Style */
+  .project-container .board {
+    background-color: var(--card-background-color);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  
+  /* Board Title */
+  .project-container .board h2 {
+    font-size: 20px;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  /* Container for Cards within a Board */
+  .project-container .cards-container {
+    flex-grow: 1;
+    margin-bottom: 20px;
+  }
+  
+  /* Card Style within a Board */
+  .project-container .card {
+    background-color: var(--card-background-color);
+    border: 1px solid #e1e4e8;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .project-container .card h3 {
+    font-size: 18px;
+    color: var(--text-color);
+    margin-bottom: 5px;
+  }
+  
+  .project-container .card p {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  /* Button to Add a Card */
+  .project-container .add-card-button {
+    background-color: var(--accent-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  .project-container .add-card-button:hover {
+    background-color: #5a4eae;
+  }
+  
+  /* Container for Adding a New Board */
+  .project-container .add-board-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  /* Button to Add a Board */
+  .project-container .add-board-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .project-container .add-board-button:hover {
+    background-color: #f7f7f7;
+  }
+  
+  /* Loading/Error Handling Messages */
+  .project-container p {
+    text-align: center;
+    font-size: 18px;
+    color: var(--text-color);
+  }
+  
+  .project-container button {
+    display: block;
+    margin: 10px auto;
+  }

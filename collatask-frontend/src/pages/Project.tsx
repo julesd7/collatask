@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+import '../styles/Project.css';
+
 interface Card {
   id: number;
   title: string;
@@ -18,6 +20,7 @@ interface Board {
 
 const Project: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [projectName, setProjectName] = useState<string>('');
   const [boards, setBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +29,11 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchBoardsAndCards = async () => {
       try {
+        const projectResponse = await axios.get(`${import.meta.env.VITE_APP_URL}/api/projects/${id}`, {
+            withCredentials: true,
+        });
+        setProjectName(projectResponse.data.project.title);
+
         const boardsResponse = await axios.get(`${import.meta.env.VITE_APP_URL}/api/boards/${id}`, {
           withCredentials: true,
         });
@@ -34,7 +42,7 @@ const Project: React.FC = () => {
           boardsResponse.data.map(async (board: Board) => {
             try {
               const cardsResponse = await axios.get(
-                `${import.meta.env.VITE_APP_URL}/api/boards/${id}/${board.id}`,
+                `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${board.id}`,
                 { withCredentials: true }
               );
               return { ...board, cards: cardsResponse.data };
@@ -48,6 +56,8 @@ const Project: React.FC = () => {
       } catch (err: any) {
         if (err.response?.status === 404) {
           navigate('/unknown');
+        } else if (err.response?.status === 500) {
+          navigate('/forbidden');
         } else {
           setError("Error while loading the boards.");
         }
@@ -117,13 +127,13 @@ const Project: React.FC = () => {
   }
 
   return (
-    <div className="project">
-      <h1>Project {id}</h1>
-      <div className="boards">
+    <div className="project-container">
+      <h1 className="project-title">{projectName}</h1>
+      <div className="boards-container">
         {boards.map((board) => (
           <div key={board.id} className="board">
             <h2>{board.title}</h2>
-            <div className="cards">
+            <div className="cards-container">
               {board.cards.length > 0 ? (
                 board.cards.map((card) => (
                   <div key={card.id} className="card">
@@ -140,8 +150,8 @@ const Project: React.FC = () => {
             </div>
           </div>
         ))}
-        <div className="add-board" onClick={addBoard}>
-          <button className="add-button">+ Add a Board</button>
+        <div className="add-board-container" onClick={addBoard}>
+          <button className="add-board-button">+ Add a Board</button>
         </div>
       </div>
     </div>

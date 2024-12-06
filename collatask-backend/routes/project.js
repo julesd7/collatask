@@ -34,6 +34,48 @@ router.post('/', authenticateJWT, async (req, res) => {
     }
 });
 
+// Route to get project details
+router.get('/:project_id', authenticateJWT, async (req, res) => {
+    const { project_id } = req.params;
+    const userId = req.user.id;
+
+    try {
+        const projectResult = await pool.query(
+            'SELECT * FROM projects WHERE id = $1',
+            [project_id]
+        );
+
+        if (projectResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        const project = projectResult.rows[0];
+
+        const roleResult = await pool.query(
+            'SELECT role FROM project_assignments WHERE project_id = $1 AND user_id = $2',
+            [project_id, userId]
+        );
+
+        let role = null;
+        if (roleResult.rows.length > 0) {
+            role = roleResult.rows[0].role;
+        }
+
+        res.status(200).json({
+            project: {
+                id: project.id,
+                title: project.title,
+                description: project.description,
+                owner_id: project.owner_id,
+            },
+            role,
+        });
+    } catch (error) {
+        console.error('Error fetching project details', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Route to edit a project
 router.put('/:project_id', authenticateJWT, async (req, res) => {
     const { project_id } = req.params;
