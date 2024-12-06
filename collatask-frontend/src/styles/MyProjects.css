@@ -1,0 +1,119 @@
+/* My Projects.css */
+
+.my-projects-container {
+    padding: 20px;
+    background-color: var(--background-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.my-projects-container .my-projects {
+    width: 90%;
+    max-width: 1200px;
+    background: var(--card-background-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    color: var(--text-color);
+}
+
+.my-projects-container .my-projects h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: var(--text-color);
+}
+
+.my-projects-container .my-projects ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.my-projects-container .project-item {
+    padding: 20px 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background-color: var(--card-background-color);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.my-projects-container .project-item:hover {
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
+}
+
+.my-projects-container .project-item h2 {
+    margin: 0 0 15px;
+    font-size: 1.8rem;
+    color: var(--accent-color);
+}
+
+.my-projects-container .project-item p {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.my-projects-container .view-button,
+.my-projects-container .create-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.my-projects-container .view-button:hover,
+.my-projects-container .create-button:hover {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    transform: translateY(-3px);
+}
+
+.my-projects-container .create-button {
+    margin-top: 30px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.my-projects-container .no-projects {
+    text-align: center;
+    padding: 30px;
+    background: var(--card-background-color);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.my-projects-container .no-projects p {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: var(--text-color);
+}
+
+.my-projects-container button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 400;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.my-projects-container button:hover {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    transform: translateY(-2px);
+}
