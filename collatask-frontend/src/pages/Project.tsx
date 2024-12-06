@@ -1,3 +1,5 @@
+// Project.tsx
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -24,12 +26,10 @@ const Project: React.FC = () => {
   useEffect(() => {
     const fetchBoardsAndCards = async () => {
       try {
-        // Récupérer les boards
         const boardsResponse = await axios.get(`${import.meta.env.VITE_APP_URL}/api/boards/${id}`, {
           withCredentials: true,
         });
 
-        // Ajouter un tableau vide de cartes à chaque board
         const boardsWithCards = await Promise.all(
           boardsResponse.data.map(async (board: Board) => {
             try {
@@ -39,7 +39,6 @@ const Project: React.FC = () => {
               );
               return { ...board, cards: cardsResponse.data };
             } catch (err: any) {
-              // Si une erreur survient (ex: pas de cartes), on retourne un tableau vide
               return { ...board, cards: [] };
             }
           })
@@ -50,7 +49,7 @@ const Project: React.FC = () => {
         if (err.response?.status === 404) {
           navigate('/unknown');
         } else {
-          setError("Erreur lors du chargement des tableaux.");
+          setError("Error while loading the boards.");
         }
       } finally {
         setLoading(false);
@@ -61,7 +60,7 @@ const Project: React.FC = () => {
   }, [id]);
 
   const addBoard = async () => {
-    const title = prompt("Entrez le titre du nouveau tableau :");
+    const title = prompt("Enter the title for the new board:");
     if (!title) return;
 
     try {
@@ -73,16 +72,16 @@ const Project: React.FC = () => {
       const newBoard = { id: response.data.board_id, title, cards: [] };
       setBoards([...boards, newBoard]);
     } catch (err) {
-      console.error("Erreur lors de la création du tableau :", err);
-      alert("Impossible de créer un nouveau tableau.");
+      console.error("Error creating the board:", err);
+      alert("Unable to create a new board.");
     }
   };
 
   const addCard = async (boardId: number) => {
-    const title = prompt("Entrez le titre de la nouvelle carte :");
+    const title = prompt("Enter the title for the new card:");
     if (!title) return;
 
-    const description = prompt("Entrez la description de la carte (optionnel) :");
+    const description = prompt("Enter the description of the card (optional):");
 
     try {
       const response = await axios.post(
@@ -93,34 +92,33 @@ const Project: React.FC = () => {
 
       const newCard = { id: response.data.card_id, title, description: description || "" };
 
-      // Mettre à jour le tableau avec la nouvelle carte
       setBoards((prevBoards) =>
         prevBoards.map((board) =>
           board.id === boardId ? { ...board, cards: [...board.cards, newCard] } : board
         )
       );
     } catch (err) {
-      console.error("Erreur lors de la création de la carte :", err);
-      alert("Impossible de créer une nouvelle carte.");
+      console.error("Error creating the card:", err);
+      alert("Unable to create a new card.");
     }
   };
 
   if (loading) {
-    return <p>Chargement...</p>;
+    return <p>Loading...</p>;
   }
 
   if (error) {
     return (
       <div>
         <p>{error}</p>
-        <button onClick={addBoard}>Créer un tableau</button>
+        <button onClick={addBoard}>Create a Board</button>
       </div>
     );
   }
 
   return (
     <div className="project">
-      <h1>Projet {id}</h1>
+      <h1>Project {id}</h1>
       <div className="boards">
         {boards.map((board) => (
           <div key={board.id} className="board">
@@ -134,16 +132,16 @@ const Project: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <p>Aucune carte dans ce tableau.</p>
+                <p>No cards in this board.</p>
               )}
               <button onClick={() => addCard(board.id)} className="add-card-button">
-                + Ajouter une carte
+                + Add a Card
               </button>
             </div>
           </div>
         ))}
         <div className="add-board" onClick={addBoard}>
-          <button className="add-button">+ Ajouter un tableau</button>
+          <button className="add-button">+ Add a Board</button>
         </div>
       </div>
     </div>
