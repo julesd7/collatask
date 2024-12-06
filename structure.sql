@@ -336,7 +336,7 @@ ALTER TABLE ONLY public.cards
 --
 
 ALTER TABLE ONLY public.projects
-    ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES public.users(id);
+    ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
