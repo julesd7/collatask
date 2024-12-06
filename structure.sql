@@ -76,6 +76,22 @@ $$;
 
 
 --
+-- Name: update_project_timestamp(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_project_timestamp() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    UPDATE projects
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.project_id;
+    RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: update_task_timestamp(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -314,6 +330,20 @@ CREATE TRIGGER trigger_update_board_timestamp BEFORE UPDATE ON public.boards FOR
 --
 
 CREATE TRIGGER trigger_update_card_last_change BEFORE UPDATE ON public.cards FOR EACH ROW EXECUTE FUNCTION public.update_card_last_change();
+
+
+--
+-- Name: boards trigger_update_project_on_board_change; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_update_project_on_board_change AFTER INSERT OR DELETE OR UPDATE ON public.boards FOR EACH ROW EXECUTE FUNCTION public.update_project_timestamp();
+
+
+--
+-- Name: cards trigger_update_project_on_card_change; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trigger_update_project_on_card_change AFTER INSERT OR DELETE OR UPDATE ON public.cards FOR EACH ROW EXECUTE FUNCTION public.update_project_timestamp();
 
 
 --
