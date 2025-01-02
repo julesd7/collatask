@@ -2,9 +2,13 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { pool } = require('../db');
 const nodemailer = require('nodemailer');
 const router = express.Router();
+
+// drizzle
+const { eq, or, and } = require('drizzle-orm');
+const { users } = require('../models');
+const { db } = require('../db');
 
 // Function to generate a refresh token
 const generateRefreshToken = (userId, rememberMe) => {
@@ -21,24 +25,25 @@ router.post('/register', async (req, res) => {
     }
 
     try {
-        const userCheck = await pool.query(
-            'SELECT * FROM users WHERE username = $1 OR email = $2',
-            [username, email]
+        const userCheck = await db.select().from(users).where(
+            or(
+                eq(users.username, username),
+                eq(users.email, email)
+            )
         );
 
-        if (userCheck.rows.length > 0) {
+        if (userCheck.length > 0) {
             return res.status(409).json({ error: 'Username or email already exists' });
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = jwt.sign({ email }, process.env.EMAIL_JWT_SECRET, { expiresIn: '1h' });
 
-        const result = await pool.query(
-            'INSERT INTO users (username, email, password, verified, verification_token) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-            [username, email, hashedPassword, false, verificationToken]
-        );
-
-        const userId = result.rows[0].id;
+        const result = await db.insert(users).values({
+            username: username,
+            email: email,
+            password: hashedPassword,
+            verification_token: verificationToken
+        }).returning({id: users.id});
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.zoho.eu',
@@ -48,7 +53,7 @@ router.post('/register', async (req, res) => {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASSWORD,
             },
-        });        
+        });
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -64,7 +69,7 @@ router.post('/register', async (req, res) => {
             }
             return res.status(201).json({
                 message: 'User registered successfully. Please check your email to verify your account.',
-                user_id: userId,
+                user_id: result[0].id,
             });
         });
 
@@ -84,11 +89,13 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        const result = await pool.query(
-            'SELECT * FROM users WHERE username = $1 OR email = $2',
-            [identifier, identifier]
+        const result = await db.select().from(users).where(
+            or(
+                eq(users.username, identifier),
+                eq(users.email, identifier)
+            )
         );
-        const user = result.rows[0];
+        const user = result[0];
 
         if (!user) {
             console.error('User not found with identifier:', identifier);
@@ -170,11 +177,14 @@ router.post('/reset', async (req, res) => {
     }
 
     try {
-        const result = await pool.query(
-            'SELECT * FROM users WHERE username = $1 OR email = $2',
-            [identifier, identifier]
+        const result = await db.select().from(users).where(
+            or(
+                eq(users.username, identifier),
+                eq(users.email, identifier)
+            )
         );
-        const user = result.rows[0];
+
+        const user = result[0];
 
         if (!user) {
             console.error('No user found with identifier:', identifier);
@@ -188,10 +198,7 @@ router.post('/reset', async (req, res) => {
 
         const resetToken = jwt.sign({ id: user.id, email: user.email }, process.env.RESET_JWT_SECRET, { expiresIn: '1h' });
 
-        await pool.query(
-            'UPDATE users SET reset_token = $1 WHERE id = $2',
-            [resetToken, user.id]
-        );
+        await db.update(users).set({ reset_token: resetToken }).where(eq(users.id, user.id));
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.zoho.eu',
@@ -235,11 +242,14 @@ router.post('/reset-password', async (req, res) => {
     try {
         const decoded = jwt.verify(token, process.env.RESET_JWT_SECRET);
 
-        const result = await pool.query(
-            'SELECT * FROM users WHERE id = $1 AND reset_token = $2',
-            [decoded.id, token]
+        const result = await db.select().from(users).where(
+            and(
+                eq(users.id, decoded.id),
+                eq(users.reset_token, token)
+            )
         );
-        const user = result.rows[0];
+        
+        const user = result[0];
 
         if (!user) {
             console.error('Invalid or expired reset token:', token);
@@ -248,10 +258,7 @@ router.post('/reset-password', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        await pool.query(
-            'UPDATE users SET password = $1, reset_token = $2 WHERE id = $3',
-            [hashedPassword, null, user.id]
-        );
+        await db.update(users).set({ password: hashedPassword, reset_token: null }).where(eq(users.id, user.id));
 
         return res.status(200).json({ message: 'Password reset successfully.' });
     } catch (err) {
@@ -269,16 +276,19 @@ router.get('/verify-email', async (req, res) => {
 
     try {
         const decoded = jwt.verify(token, process.env.EMAIL_JWT_SECRET);
+        
+        const user = await db.select().from(users).where(
+            and(
+                eq(users.email, decoded.email),
+                eq(users.verification_token, token)
+            )
+        );
 
-        const user = await pool.query('SELECT * FROM users WHERE email = $1 AND verification_token = $2', 
-            [decoded.email, token]);
-
-        if (user.rows.length === 0) {
+        if (user.length === 0) {
             return res.status(400).json({ error: 'Invalid or expired verification token.' });
         }
 
-        await pool.query('UPDATE users SET verified = $1, verification_token = $2 WHERE email = $3', 
-            [true, null, decoded.email]);
+        await db.update(users).set({ verified: true, verification_token: null }).where(eq(users.email, decoded.email));
 
         return res.status(200).json({ message: 'Email verified successfully. You can now log in.' });
     } catch (err) {
