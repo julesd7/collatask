@@ -1,6 +1,5 @@
 // boards.js
 const express = require('express');
-const { pool } = require('../db');
 const { authenticateJWT } = require('../middleware/authMiddleware');
 const { roleMiddleware } = require('../middleware/roleMiddleware');
 const router = express.Router();
