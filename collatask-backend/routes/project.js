@@ -1,7 +1,11 @@
 // project.js
 const express = require('express');
-const { pool } = require('../db');
 const router = express.Router();
+
+// drizzle
+const { eq, and } = require('drizzle-orm');
+const { projects, projectAssignments } = require('../models');
+const { db } = require('../db');
 
 const { authenticateJWT } = require('../middleware/authMiddleware');
 
@@ -15,17 +19,19 @@ router.post('/', authenticateJWT, async (req, res) => {
     }
 
     try {
-        const result = await pool.query(
-            'INSERT INTO projects (title, description, owner_id) VALUES ($1, $2, $3) RETURNING id',
-            [title, description, ownerId]
-        );
+        const result = await db.insert(projects).values({
+            title,
+            description,
+            owner_id: ownerId,
+        }).returning({ id: projects.id });
 
-        const newProjectId = result.rows[0].id;
+        const newProjectId = result[0].id;
 
-        await pool.query(
-            'INSERT INTO project_assignments (user_id, project_id, role) VALUES ($1, $2, $3)',
-            [ownerId, newProjectId, 'owner']
-        );
+        await db.insert(projectAssignments).values({
+            user_id: ownerId,
+            project_id: newProjectId,
+            role: 'owner',
+        });
 
         res.status(201).json({ message: 'Project created successfully', project_id: newProjectId });
     } catch (error) {
@@ -40,35 +46,17 @@ router.get('/:project_id', authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const projectResult = await pool.query(
-            'SELECT * FROM projects WHERE id = $1',
-            [project_id]
-        );
+        const projectResult = await db.select().from(projects).where(eq(projects.id, project_id));
 
-        if (projectResult.rows.length === 0) {
+        if (projectResult.length === 0) {
             return res.status(404).json({ error: 'Project not found' });
         }
 
-        const project = projectResult.rows[0];
-
-        const roleResult = await pool.query(
-            'SELECT role FROM project_assignments WHERE project_id = $1 AND user_id = $2',
-            [project_id, userId]
-        );
-
-        let role = null;
-        if (roleResult.rows.length > 0) {
-            role = roleResult.rows[0].role;
-        }
-
+        const roleResult = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.project_id, project_id), eq(projectAssignments.user_id, userId)));
+        
         res.status(200).json({
-            project: {
-                id: project.id,
-                title: project.title,
-                description: project.description,
-                owner_id: project.owner_id,
-            },
-            role,
+            project: projectResult[0],
+            role: roleResult[0].role,
         });
     } catch (error) {
         console.error('Error fetching project details', error);
@@ -83,47 +71,23 @@ router.put('/:project_id', authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const roleCheck = await pool.query(
-            'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [userId, project_id]
-        );
+        const roleCheck = await db.select({ role: projectAssignments.role }).from(projectAssignments).where(and(eq(projectAssignments.project_id, project_id), eq(projectAssignments.user_id, userId)));
 
-        if (roleCheck.rowCount === 0) {
+        if (roleCheck.length === 0) {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
 
-        const userRole = roleCheck.rows[0].role;
-        if (userRole !== 'owner' && userRole !== 'admin') {
+        if (roleCheck[0].role !== 'owner' && roleCheck[0].role !== 'admin') {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
 
-        const updates = [];
-        const values = [];
+        const result = await db.update(projects).set({title: title, description: description}).where(eq(projects.id, project_id)).returning();
 
-        if (title) {
-            updates.push(`title = $${updates.length + 1}`);
-            values.push(title);
-        }
-        if (description) {
-            updates.push(`description = $${updates.length + 1}`);
-            values.push(description);
-        }
-
-        if (updates.length === 0) {
-            return res.status(204).send();
-        }
-
-        values.push(project_id);
-
-        const query = `UPDATE projects SET ${updates.join(', ')} WHERE id = $${values.length} RETURNING *`;
-        const result = await pool.query(query, values);
-
-        if (result.rowCount === 0) {
+        if (result.length === 0) {
             return res.status(404).json({ error: 'Project not found' });
         }
 
-        const updatedProject = result.rows[0];
-        res.status(200).json(updatedProject);
+        res.status(200).json(result[0]);
     } catch (error) {
         console.error('Error updating project', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -136,30 +100,20 @@ router.delete('/:project_id', authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
     try {
-
-        const projectCheck = await pool.query(
-            'SELECT * FROM projects WHERE id = $1',
-            [project_id]
-        );
-
-        if (projectCheck.rows.length === 0) {
+        const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
+        if (projectCheck.length === 0) {
             return res.status(404).json({ error: 'Project not found' });
         }
 
-        const roleCheck = await pool.query(
-            'SELECT owner_id FROM projects WHERE id = $1',
-            [project_id]
-        );
-        
-        const userRole = roleCheck.rows[0].role;
-        if (roleCheck.rows[0].owner_id !== userId) {
+        const ownerCheck = await db.select({ owner_id: projects.owner_id }).from(projects).where(eq(projects.id, project_id));
+        if (ownerCheck[0].owner_id !== userId) {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
 
-        const result = await pool.query('DELETE FROM projects WHERE id = $1 RETURNING *', [project_id]);
+        console.log('deleting project');
+        await db.delete(projects).where(eq(projects.id, project_id));
 
-        const deletedProject = result.rows[0];
-        res.status(200).json({ message: 'Project deleted successfully', project: deletedProject });
+        res.status(200).json({ message: 'Project deleted successfully' });
     } catch (error) {
         console.error('Error deleting project', error);
         res.status(500).json({ error: 'Internal server error' });

@@ -6,7 +6,7 @@ const router = express.Router();
 
 // drizzle
 const { eq, and } = require('drizzle-orm');
-const { cards, projects, users, boards, projectAssignments } = require('../models');
+const { cards, projects, boards, projectAssignments } = require('../models');
 const { db } = require('../db');
 
 // Endpoint to get all cards
