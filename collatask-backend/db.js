@@ -1,3 +1,4 @@
+const { drizzle } = require('drizzle-orm/node-postgres');
 const { Pool } = require('pg');
 require('dotenv').config();
 
@@ -9,13 +10,6 @@ const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
-async function connectDB() {
-  try {
-    await pool.connect();
-    console.log('Connected to the database');
-  } catch (err) {
-    console.error('Error connecting to the database', err);
-  }
-}
+const db = drizzle(pool);
 
-module.exports = { connectDB, pool };
+module.exports = { pool, db };
