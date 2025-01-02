@@ -1,9 +1,13 @@
 //cards.js
 const express = require('express');
-const { pool } = require('../db');
 const { authenticateJWT } = require('../middleware/authMiddleware');
 const { roleMiddleware } = require('../middleware/roleMiddleware');
 const router = express.Router();
+
+// drizzle
+const { eq, and } = require('drizzle-orm');
+const { cards, projects, users, boards, projectAssignments } = require('../models');
+const { db } = require('../db');
 
 // Endpoint to get all cards
 router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
@@ -13,31 +17,25 @@ router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    const projectCheck = await pool.query(
-        'SELECT * FROM projects WHERE id = $1',
-        [project_id]
-    );
+    const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
 
-    if (projectCheck.rowCount === 0) {
-        return res.status(404).json({ error: 'Project or board not found.' });
+    if (projectCheck.length === 0) {
+        return res.status(404).json({ error: 'Project not found.' });
     }
 
-    const boardCheck = await pool.query(
-        'SELECT * FROM boards WHERE id = $1 AND project_id = $2',
-        [board_id, project_id]
-    );
+    const boardCheck = await db.select().from(boards).where(and(eq(boards.id, board_id), eq(boards.project_id, project_id)));
 
     if (boardCheck.rowCount === 0) {
-        return res.status(404).json({ error: 'Project or board not found.' });
+        return res.status(404).json({ error: 'Board not found.' });
     }
 
     try {
-        const cards = await pool.query('SELECT * FROM cards WHERE project_id = $1 AND board_id = $2', [project_id, board_id]);
+        const cardsResult = await db.select().from(cards).where(and(eq(cards.project_id, project_id), eq(cards.board_id, board_id)));
 
-        if (cards.rowCount === 0) {
+        if (cardsResult.length === 0) {
             return res.status(404).json({ error: 'No cards found for this project and board.' });
         }
-        res.status(200).json(cards.rows);
+        res.status(200).json(cardsResult);
     } catch (error) {
         console.error('Error fetching cards', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -54,40 +52,36 @@ router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewe
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    const projectCheck = await pool.query(
-        'SELECT * FROM projects WHERE id = $1',
-        [project_id]
-    );
+    const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
 
-    if (projectCheck.rowCount === 0) {
+    if (projectCheck.length === 0) {
         return res.status(404).json({ error: 'Project or board not found.' });
     }
 
-    const existingAssignment = await pool.query(
-        'SELECT * FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-        [user_id, project_id]
-    );
+    const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
 
-    if (existingAssignment.rowCount === 0) {
+    if (existingAssignment.length === 0) {
         return res.status(403).json({ error: 'User not assigned to this project.' });
     }
 
-    const boardCheck = await pool.query(
-        'SELECT * FROM boards WHERE id = $1 AND project_id = $2',
-        [board_id, project_id]
-    );
+    const boardCheck = await db.select().from(boards).where(and(eq(boards.id, board_id), eq(boards.project_id, project_id)));
 
-    if (boardCheck.rowCount === 0) {
+    if (boardCheck.length === 0) {
         return res.status(404).json({ error: 'Project or board not found.' });
     }
 
     try {
-        const result = await pool.query(
-            'INSERT INTO cards (project_id, board_id, title, description, start_date, end_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-            [project_id, board_id, title, description, start_date, end_date]
-        );
+        const result = await db.insert(cards).values({
+                project_id: project_id,
+                board_id: board_id,
+                title: title,
+                description: description,
+                start_date: start_date,
+                end_date: end_date
+            }
+        ).returning({ id: cards.id });    
 
-        res.status(201).json({ message: 'Card created successfully.', card_id: result.rows[0].id });
+        res.status(201).json({ message: 'Card created successfully.', card_id: result[0].id });
     } catch (error) {
         console.error('Error creating card', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -104,51 +98,42 @@ router.put('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware([]
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    const projectCheck = await pool.query(
-        'SELECT * FROM projects WHERE id = $1',
-        [project_id]
-    );
-
-    if (projectCheck.rowCount === 0) {
-        return res.status(404).json({ error: 'Project, board, or card not found.' });
-    }
-
-    const existingAssignment = await pool.query(
-        'SELECT * FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-        [user_id, project_id]
-    );
-
-    if (existingAssignment.rowCount === 0) {
-        return res.status(404).json({ error: 'User not assigned to this project.' });
-    }
-
-    const boardCheck = await pool.query(
-        'SELECT * FROM boards WHERE id = $1 AND project_id = $2',
-        [board_id, project_id]
-    );
-
-    if (boardCheck.rowCount === 0) {
-        return res.status(404).json({ error: 'Project, board, or card not found.' });
-    }
-
-    const cardCheck = await pool.query(
-        'SELECT * FROM cards WHERE id = $1 AND project_id = $2 AND board_id = $3',
-        [card_id, project_id, board_id]
-    );
-
-    if (cardCheck.rowCount === 0) {
-        return res.status(404).json({ error: 'Project, board, or card not found.' });
-    }
-
     if (!title && !description && !start_date && !end_date) {
         return res.status(204).send();
     }
 
+    const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
+
+    if (projectCheck.length === 0) {
+        return res.status(404).json({ error: 'Project, board, or card not found.' });
+    }
+
+    const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+
+    if (existingAssignment.length === 0) {
+        return res.status(404).json({ error: 'User not assigned to this project.' });
+    }
+
+    const boardCheck = await db.select().from(boards).where(and(eq(boards.id, board_id), eq(boards.project_id, project_id)));
+
+    if (boardCheck.length === 0) {
+        return res.status(404).json({ error: 'Project, board, or card not found.' });
+    }
+
+    const cardCheck = await db.select().from(cards).where(and(eq(cards.id, card_id), eq(cards.project_id, project_id), eq(cards.board_id, board_id)));
+
+    if (cardCheck.length === 0) {
+        return res.status(404).json({ error: 'Project, board, or card not found.' });
+    }
+
     try {
-        await pool.query(
-            'UPDATE cards SET title = $1, description = $2, start_date = $3, end_date = $4 WHERE id = $5',
-            [title, description, start_date, end_date, card_id]
-        );
+        await db.update(cards).set({
+                title: title,
+                description: description,
+                start_date: start_date,
+                end_date: end_date
+            }
+        ).where(eq(cards.id, card_id));
 
         res.status(200).json({ message: 'Card updated successfully.' });
     } catch (error) {
@@ -166,48 +151,28 @@ router.delete('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    const projectCheck = await pool.query(
-        'SELECT * FROM projects WHERE id = $1',
-        [project_id]
-    );
-
-    if (projectCheck.rowCount === 0) {
+    const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
+    if (projectCheck.length === 0) {
         return res.status(404).json({ error: 'Project, board, or card not found.' });
     }
 
-    const existingAssignment = await pool.query(
-        'SELECT * FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-        [user_id, project_id]
-    );
-
-    if (existingAssignment.rowCount === 0) {
+    const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+    if (existingAssignment.length === 0) {
         return res.status(404).json({ error: 'User not assigned to this project.' });
     }
 
-    const boardCheck = await pool.query(
-        'SELECT * FROM boards WHERE id = $1 AND project_id = $2',
-        [board_id, project_id]
-    );
-
-    if (boardCheck.rowCount === 0) {
+    const boardCheck = await db.select().from(boards).where(and(eq(boards.id, board_id), eq(boards.project_id, project_id)));
+    if (boardCheck.length === 0) {
         return res.status(404).json({ error: 'Project, board, or card not found.' });
     }
 
-    const cardCheck = await pool.query(
-        'SELECT * FROM cards WHERE id = $1 AND project_id = $2 AND board_id = $3',
-        [card_id, project_id, board_id]
-    );
-
-    if (cardCheck.rowCount === 0) {
+    const cardCheck = await db.select().from(cards).where(and(eq(cards.id, card_id), eq(cards.project_id, project_id), eq(cards.board_id, board_id)));
+    if (cardCheck.length === 0) {
         return res.status(404).json({ error: 'Project, board, or card not found.' });
     }
 
     try {
-        await pool.query(
-            'DELETE FROM cards WHERE id = $1',
-            [card_id]
-        );
-
+        await db.delete(cards).where(eq(cards.id, card_id));
         res.status(200).json({ message: 'Card deleted successfully.' });
     } catch (error) {
         console.error('Error deleting card', error);
