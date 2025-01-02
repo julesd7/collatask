@@ -5,6 +5,11 @@ const { authenticateJWT } = require('../middleware/authMiddleware');
 const { roleMiddleware } = require('../middleware/roleMiddleware');
 const router = express.Router();
 
+// drizzle
+const { eq, or, and } = require('drizzle-orm');
+const { projects, boards } = require('../models');
+const { db } = require('../db');
+
 // Endpoint to get all boards from a project
 router.get('/:project_id', authenticateJWT, async (req, res) => {
     const { project_id } = req.params;
@@ -13,22 +18,19 @@ router.get('/:project_id', authenticateJWT, async (req, res) => {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    const projectCheck = await pool.query(
-        'SELECT * FROM projects WHERE id = $1',
-        [project_id]
-    );
+    const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
 
-    if (projectCheck.rowCount === 0) {
+    if (projectCheck.length === 0) {
         return res.status(404).json({ error: 'Project not found.' });
     }
 
     try {
-        const boards = await pool.query('SELECT * FROM boards WHERE project_id = $1', [project_id]);
+        const boardsResults = await db.select().from(boards).where(eq(boards.project_id, project_id));
 
-        if (boards.rowCount === 0) {
+        if (boardsResults.length === 0) {
             return res.status(404).json({ error: 'No boards found for this project.' });
         }
-        res.status(200).json(boards.rows);
+        res.status(200).json(boardsResults);
     } catch (error) {
         console.error('Error fetching boards', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -44,24 +46,20 @@ router.post('/:project_id', authenticateJWT, roleMiddleware(['owner', 'admin']),
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    const projectCheck = await pool.query(
-        'SELECT * FROM projects WHERE id = $1',
-        [project_id]
-    );
+    const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
 
-    if (projectCheck.rowCount === 0) {
+    if (projectCheck.length === 0) {
         return res.status(404).json({ error: 'Project not found.' });
     }
 
     try {
-        const result = await pool.query(
-            'INSERT INTO boards (title, project_id) VALUES ($1, $2) RETURNING id',
-            [title, project_id]
-        );
+        const result = await db.insert(boards).values({ 
+                title: title, 
+                project_id: project_id
+            }
+        ).returning({ id: boards.id });
 
-        const newBoardId = result.rows[0].id;
-
-        res.status(201).json({ message: 'Board created successfully', board_id: newBoardId });
+        res.status(201).json({ message: 'Board created successfully', board_id: result[0].id });
     } catch (error) {
         console.error('Error creating board', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -78,16 +76,12 @@ router.put('/:project_id/:board_id', authenticateJWT, roleMiddleware(['owner', '
     }
 
     try {
-        const result = await pool.query(
-            'UPDATE boards SET title = $1 WHERE id = $2 RETURNING *',
-            [title, board_id]
-        );
+        const result = await db.update(boards).set({ title: title }).where(eq(boards.id, board_id)).returning();
 
-        if (result.rowCount === 0) {
+        if (result.length === 0) {
             return res.status(404).json({ error: 'Board not found.' });
         }
-
-        res.status(200).json({ message: 'Board updated successfully', board: result.rows[0] });
+        res.status(200).json({ message: 'Board updated successfully', board: result });
     } catch (error) {
         console.error('Error updating board', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -103,12 +97,9 @@ router.delete('/:project_id/:board_id', authenticateJWT, roleMiddleware(['owner'
     }
 
     try {
-        const result = await pool.query(
-            'DELETE FROM boards WHERE id = $1 RETURNING *',
-            [board_id]
-        );
+        const result = await db.delete(boards).where(eq(boards.id, board_id));
 
-        if (result.rowCount === 0) {
+        if (result.length === 0) {
             return res.status(404).json({ error: 'Board not found.' });
         }
 
