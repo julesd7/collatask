@@ -14,7 +14,7 @@ const authenticateJWT = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
 
-        const user = await db.select().from(users).where(eq('id', decoded.id));
+        const user = await db.select().from(users).where(eq(users.id, decoded.id));
         req.user = { ...req.user, ...user[0] };
 
         next();

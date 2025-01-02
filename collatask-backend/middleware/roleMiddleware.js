@@ -7,7 +7,7 @@ const roleMiddleware = (requiredRoles = [], forbiddenRoles = []) => {
         const userId = req.user.id;
         const { project_id } = req.params;
 
-        const roleCheck = await db.select(role).from(projectAssignments).where(
+        const roleCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(
             and(
                 eq(projectAssignments.user_id, userId),
                 eq(projectAssignments.project_id, project_id)
@@ -27,7 +27,6 @@ const roleMiddleware = (requiredRoles = [], forbiddenRoles = []) => {
         if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
             return res.status(403).json({ role: 'Forbidden access.' });
         }
-
         next();
     };
 };
