@@ -1,20 +1,24 @@
-const { pool } = require('../db');
+const { eq, and } = require('drizzle-orm');
+const { projectAssignments } = require('../models');
+const { db } = require('../db');
 
 const roleMiddleware = (requiredRoles = [], forbiddenRoles = []) => {
     return async (req, res, next) => {
         const userId = req.user.id;
         const { project_id } = req.params;
 
-        const roleCheck = await pool.query(
-            'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [userId, project_id]
+        const roleCheck = await db.select(role).from(projectAssignments).where(
+            and(
+                eq(projectAssignments.user_id, userId),
+                eq(projectAssignments.project_id, project_id)
+            )
         );
 
-        if (roleCheck.rowCount === 0) {
+        if (roleCheck.length === 0) {
             return res.status(403).json({ role: 'Forbidden access.' });
         }
 
-        const userRole = roleCheck.rows[0].role;
+        const userRole = roleCheck[0].role;
 
         if (forbiddenRoles.includes(userRole)) {
             return res.status(403).json({ role: 'Forbidden access.' });

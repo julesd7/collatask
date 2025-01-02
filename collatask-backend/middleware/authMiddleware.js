@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
-const { pool } = require('../db');
+const { users } = require('../models');
+const { eq } = require('drizzle-orm');
+const { db } = require('../db');
 
 const authenticateJWT = async (req, res, next) => {
     const token = req.cookies.accessToken;
@@ -12,8 +14,8 @@ const authenticateJWT = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
 
-        const user = await pool.query('SELECT * FROM users WHERE id = $1', [decoded.id]);
-        req.user = { ...req.user, ...user.rows[0] };
+        const user = await db.select().from(users).where(eq('id', decoded.id));
+        req.user = { ...req.user, ...user[0] };
 
         next();
     } catch (err) {
