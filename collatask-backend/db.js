@@ -12,4 +12,4 @@ const pool = new Pool({
 
 const db = drizzle(pool);
 
-module.exports = { pool, db };
+module.exports = { db };
