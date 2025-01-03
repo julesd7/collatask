@@ -5,11 +5,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Home.css';
 
-import Logo from '../assets/logo_white_500x500.png';
+import Navbar from '../components/Navbar';
 
 const Home: React.FC = () => {
   const [recentProjects, setRecentProjects] = React.useState<any[]>([]);
-  const [selectedProject, setSelectedProject] = React.useState<any | null>(null); // pour afficher les détails du projet
   const navigate = useNavigate();
 
   const getRecentlyUpdatedProjects = async () => {
@@ -23,17 +22,6 @@ const Home: React.FC = () => {
     }
   }
 
-  const handleSignOut = async () => {
-    try {
-      await axios.post(`${import.meta.env.VITE_APP_URL}/api/auth/logout`, {}, {
-        withCredentials: true,
-      });
-      window.location.reload();
-    } catch (error) {
-      console.error('An error occurred while signing out.');
-    }
-  }
-
   React.useEffect(() => {
     const fetchProjects = async () => {
       const projects = await getRecentlyUpdatedProjects();
@@ -44,25 +32,23 @@ const Home: React.FC = () => {
   }, []);
 
   const timeSinceLastUpdate = (date: string): string => {
-    return 'TODO: Calculate time since last update';
-  };
+    const now = new Date();
+    const lastUpdate = new Date(date);
+    const diffInSeconds = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
+    
+    const minutes = Math.floor(diffInSeconds / 60) + 60;
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+  
+    if (days > 0) return `${days} days ago`;
+    if (hours > 0) return `${hours} hours ago`;
+    if (minutes > 0) return `${minutes} minutes ago`;
+    return `just now`;
+  };  
 
   return (
     <div className="home-container">
-      <header className="home-header">
-        <div className='header-logo' onClick={() => navigate('/')}>
-            <img src={Logo} alt="Collatask Logo" className="logo" />
-            <p className='logo-text'>Collatask</p>
-        </div>
-        <button className="create-button" onClick={() => navigate('/create-project')}>
-            Create <span className="arrow">→</span>
-        </button>
-        <div className="links">
-          <a href="/my-projects" className="nav-link">My projects</a>
-          <a href="/about" className="nav-link">Profile</a>
-          <a onClick={handleSignOut} className="nav-link">Sign out</a>
-        </div>
-      </header>
+      <Navbar />
       <div className="home-content">
         <div className="home-text">
           <h1>Welcome to Collatask</h1>
@@ -72,22 +58,23 @@ const Home: React.FC = () => {
           <h2>Recently Updated Projects</h2>
           <ul>
             {recentProjects.slice(0, 3).map((project: any) => (
-              <li key={project.id}>
-                {project.title}
-                <button onClick={() => setSelectedProject(project)}>View</button>
-                {selectedProject && selectedProject.id === project.id && (
-                  <div className="project-details">
-                    <p>{project.description}</p>
-                    <p>Last updated: {timeSinceLastUpdate(project.updated_at)}</p>
-                  </div>
-                )}
+              <li key={project.id} className="project-item">
+                <h3>{project.title}</h3>
+                <p>{project.description}</p>
+                <button
+                  onClick={() => navigate(`/project/${project.id}`)}
+                  className="view-button"
+                >
+                  View Project
+                </button>
+                <p className="last-updated">Last updated: {timeSinceLastUpdate(project.updated_at)}</p>
               </li>
             ))}
           </ul>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default Home;

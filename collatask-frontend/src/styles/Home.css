@@ -9,65 +9,86 @@
     align-items: center;
 }
 
-.home-container .home-header {
+.home-container .home-content {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    position: relative;
+    gap: 20px;
+    margin-top: 70px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.home-container .home-content .home-text {
+    text-align: center;
+}
+
+.home-container .recently-update-projects {
     width: 100%;
-    padding: 20px;
-    background-color: var(--card-background-color);
+    max-width: 800px;
+    background: var(--card-background-color);
+    border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    color: var(--text-color);
 }
 
-.home-container .header-logo {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin-left: 20px;
+.home-container .recently-update-projects h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 30px;
 }
 
-.home-container .header-logo .logo {
-    width: 40px;
-    margin-right: 8px;
+.home-container .recently-update-projects ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.home-container .header-logo .logo-text {
-    font-size: 24px;
-    font-weight: bold;
+.home-container .project-item {
+    padding: 20px 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background-color: var(--card-background-color);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-.home-container .create-button {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
+.home-container .project-item:hover {
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
+}
+
+.home-container .project-item h3 {
+    margin: 0 0 15px;
+    font-size: 1.6rem;
+    color: var(--accent-color);
+}
+
+.home-container .project-item p {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.home-container .view-button {
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.home-container .create-button .arrow {
-    margin-left: 5px;
+.home-container .view-button:hover {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    transform: translateY(-3px);
 }
 
-.home-container .links {
-    display: flex;
-    gap: 40px;
-    position: absolute;
-    right: 40px;
-}
-
-.home-container .nav-link {
-    text-decoration: none;
-    color: #333;
-    color: #fff;
-}
-
-.home-container .nav-link:hover {
-    text-decoration: underline;
-    cursor: pointer;
+.home-container .last-updated {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-top: 10px;
 }
