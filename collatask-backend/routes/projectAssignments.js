@@ -1,8 +1,12 @@
 // projectAssignments.js
 const express = require('express');
-const { pool } = require('../db');
 const { authenticateJWT } = require('../middleware/authMiddleware');
 const router = express.Router();
+
+// drizzle
+const { eq, and, sql } = require('drizzle-orm');
+const { projects, users, projectAssignments } = require('../models');
+const { db } = require('../db');
 
 // Assign project to user
 router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
@@ -10,62 +14,46 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
     const { email, role } = req.body;
     const requesterId = req.user.id;
 
-    const projectCheck = await pool.query(
-        'SELECT * FROM projects WHERE id = $1',
-        [project_id]
-    );
-
-    if (projectCheck.rowCount === 0) {
-        return res.status(404).json({ error: 'Project not found' });
-    }
-
     if (!email || !project_id) {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    try {
-        const userCheck = await pool.query(
-            'SELECT id FROM users WHERE email = $1',
-            [email]
-        );
+    const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
+    if (projectCheck.length === 0) {
+        return res.status(404).json({ error: 'Project not found' });
+    }
 
-        if (userCheck.rowCount === 0) {
+    try {
+        const userCheck = await db.select({id: users.id}).from(users).where(eq(users.email, email));
+        if (userCheck.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const user_id = userCheck.rows[0].id;
+        const user_id = userCheck[0].id;
 
-        const roleCheck = await pool.query(
-            'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [requesterId, project_id]
-        );
-
-        if (roleCheck.rowCount === 0) {
+        const roleCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, requesterId), eq(projectAssignments.project_id, project_id)));
+        if (roleCheck.length === 0) {
             return res.status(403).json({ error: 'You are not assigned to this project' });
         }
 
-        const requesterRole = roleCheck.rows[0].role;
+        const requesterRole = roleCheck[0].role;
         if (requesterRole !== 'owner' && requesterRole !== 'admin') {
             return res.status(403).json({ error: 'Only the project owner or administrator can assign users' });
         }
 
-        const existingAssignment = await pool.query(
-            'SELECT * FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [user_id, project_id]
-        );
-
-        if (existingAssignment.rowCount > 0) {
+        const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+        if (existingAssignment.length > 0) {
             return res.status(409).json({ error: 'User already assigned to this project' });
         }
 
         const userRole = role || 'viewer';
 
-        const result = await pool.query(
-            'INSERT INTO project_assignments (user_id, project_id, role) VALUES ($1, $2, $3) RETURNING *',
-            [user_id, project_id, userRole]
-        );
-
-        res.status(201).json({ message: 'Project assigned successfully', assignment: result.rows[0] });
+        const result = await db.insert(projectAssignments).values({
+            user_id: user_id,
+            project_id: project_id,
+            role: userRole,
+        }).returning();
+        res.status(201).json({ message: 'Project assigned successfully', assignment: result[0] });
     } catch (error) {
         console.error('Error assigning project', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -82,26 +70,22 @@ router.put('/role/:project_id', authenticateJWT, async (req, res) => {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    try {
-        const projectCheck = await pool.query(
-            'SELECT * FROM projects WHERE id = $1',
-            [project_id]
-        );
+    if (user_id === requesterId) {
+        return res.status(403).json({ error: 'You cannot change your own role.' });
+    }
 
-        if (projectCheck.rowCount === 0) {
+    try {
+        const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
+        if (projectCheck.length === 0) {
             return res.status(404).json({ error: 'Project not found' });
         }
     
-        const roleCheck = await pool.query(
-            'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [requesterId, project_id]
-        );
-
-        if (roleCheck.rowCount === 0) {
+        const roleCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, requesterId), eq(projectAssignments.project_id, project_id)));
+        if (roleCheck.length === 0) {
             return res.status(403).json({ error: 'Forbidden access.' });
         };
 
-        const requesterRole = roleCheck.rows[0].role;
+        const requesterRole = roleCheck[0].role;
         if (requesterRole !== 'owner' && requesterRole !== 'admin') {
             return res.status(403).json({ error: 'Forbidden access.' });
         };
@@ -110,12 +94,8 @@ router.put('/role/:project_id', authenticateJWT, async (req, res) => {
             return res.status(403).json({ error: 'Forbidden access.' });
         };
 
-        const existingAssignment = await pool.query(
-            'SELECT * FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [user_id, project_id]
-        );
-
-        if (existingAssignment.rowCount === 0) {
+        const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+        if (existingAssignment.length === 0) {
             return res.status(404).json({ error: 'User not assigned to this project.' });
         };
 
@@ -123,32 +103,16 @@ router.put('/role/:project_id', authenticateJWT, async (req, res) => {
             return res.status(403).json({ error: 'Forbidden access.' });
         };
 
-        const ownerCheck = await pool.query(
-            'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [user_id, project_id]
-        );
-
-        if ((ownerCheck.rows[0].role === 'owner' || ownerCheck.rows[0].role === 'admin') && requesterRole !== 'owner') {
+        const ownerCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+        if ((ownerCheck[0].role === 'owner' || ownerCheck[0].role === 'admin') && requesterRole !== 'owner') {
             return res.status(403).json({ error: 'You cannot change the role of the project administrators' });
         };
 
         if (role === 'owner' && requesterRole === 'owner') {
-            await pool.query(
-               'UPDATE project_assignments SET role = $1 WHERE user_id = $2 AND project_id = $3',
-                ['admin', requesterId, project_id]
-            );
-            await pool.query(
-                'UPDATE projects SET owner_id = $1 WHERE id = $2',
-                [user_id, project_id]
-            );
+            await db.update(projectAssignments).set({role: 'admin'}).where(and(eq(projectAssignments.user_id, requesterId), eq(projectAssignments.project_id, project_id)));
+            await db.update(projects).set({owner_id: user_id, updated_at: sql`NOW()`}).where(eq(projects.id, project_id));
         }
-
-        await pool.query(
-            'UPDATE project_assignments SET role = $1 WHERE user_id = $2 AND project_id = $3',
-            [role, user_id, project_id]
-        );
-
-
+        await db.update(projectAssignments).set({role: role}).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
         res.status(200).json({ message: 'User role updated successfully.' });
     } catch (error) {
         console.error('Error updating user role', error);
@@ -167,52 +131,32 @@ router.delete('/remove/:project_id', authenticateJWT, async (req, res) => {
     }
 
     try {
-        const projectCheck = await pool.query(
-            'SELECT * FROM projects WHERE id = $1',
-            [project_id]
-        );
-
-        if (projectCheck.rowCount === 0) {
+        const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
+        if (projectCheck.length === 0) {
             return res.status(404).json({ error: 'Project not found.' });
         }
 
-        const roleCheck = await pool.query(
-            'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [requesterId, project_id]
-        );
-
-        if (roleCheck.rowCount === 0) {
+        const roleCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, requesterId), eq(projectAssignments.project_id, project_id)));
+        if (roleCheck.length === 0) {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
 
-        const requesterRole = roleCheck.rows[0].role;
+        const requesterRole = roleCheck[0].role;
         if (requesterRole !== 'owner' && requesterRole !== 'admin') {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
 
-        const existingAssignment = await pool.query(
-            'SELECT * FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [user_id, project_id]
-        );
-
-        if (existingAssignment.rowCount === 0) {
+        const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+        if (existingAssignment.length === 0) {
             return res.status(404).json({ error: 'User not assigned to this project.' });
         }
 
-        const ownerCheck = await pool.query(
-            'SELECT role FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [user_id, project_id]
-        );
-
-        if (ownerCheck.rows[0].role === 'owner') {
+        const ownerCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+        if (ownerCheck[0].role === 'owner') {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
 
-        await pool.query(
-            'DELETE FROM project_assignments WHERE user_id = $1 AND project_id = $2',
-            [user_id, project_id]
-        );
-
+        await db.delete(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
         res.status(200).json({ message: 'User removed successfully.' });
     } catch (error) {
         console.error('Error removing user from project', error);
