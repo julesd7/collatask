@@ -1,8 +1,12 @@
 // user.js
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const { pool } = require('../db');
 const router = express.Router();
+
+// drizzle
+const { eq, or } = require('drizzle-orm');
+const { users } = require('../models');
+const { db } = require('../db');
 
 const { authenticateJWT } = require('../middleware/authMiddleware');
 
@@ -21,45 +25,25 @@ router.get('/me', authenticateJWT, (req, res) => {
 router.put('/update', authenticateJWT, async (req, res) => {
     const { username, email, password } = req.body;
     const userId = req.user.id;
+    let hashedPassword = req.user.password;
 
     try {
         if (username || email) {
-            const existingUserCheck = await pool.query(
-                'SELECT * FROM users WHERE (username = $1 OR email = $2) AND id != $3',
-                [username, email, userId]
-            );
-
-            if (existingUserCheck.rows.length > 0) {
+            const existingUserCheck = await db.select().from(users).where(or(eq(users.username, username), eq(users.email, email)), eq(users.id, userId));
+            if (existingUserCheck.length > 0) {
                 return res.status(409).json({ error: 'Username or email already exists.' });
             }
         }
 
-        const updates = [];
-        const values = [];
-
-        if (username) {
-            updates.push(`username = $${updates.length + 1}`);
-            values.push(username);
-        }
-
-        if (email) {
-            updates.push(`email = $${updates.length + 1}`);
-            values.push(email);
-        }
-
         if (password) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            updates.push(`password = $${updates.length + 1}`);
-            values.push(hashedPassword);
+            hashedPassword = await bcrypt.hash(password, 10);
         }
-
-        if (updates.length > 0) {
-            const query = `UPDATE users SET ${updates.join(', ')} WHERE id = $${updates.length + 1}`;
-            values.push(userId);
-
-            await pool.query(query, values);
-            return res.status(200).json({ message: 'User information updated successfully.' });
-        }
+        await db.update(users).set({
+            username: username,
+            email: email,
+            password: hashedPassword,
+        }).where(eq(users.id, userId));
+        return res.status(200).json({ message: 'User information updated successfully.' });
 
         res.status(204).send();
     } catch (error) {
@@ -73,12 +57,10 @@ router.delete('/delete', authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const result = await pool.query('DELETE FROM users WHERE id = $1', [userId]);
-
-        if (result.rowCount === 0) {
+        const result = await db.delete(users).where(eq(users.id, userId));
+        if (result.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
         console.error('Error deleting user', error);
