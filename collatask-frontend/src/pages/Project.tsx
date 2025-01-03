@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 import '../styles/Project.css';
+import { get } from 'http';
 
 interface Card {
   id: number;
@@ -24,6 +25,7 @@ const Project: React.FC = () => {
   const [boards, setBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [getCardId, setCardId] = useState<number>(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,21 +71,44 @@ const Project: React.FC = () => {
     fetchBoardsAndCards();
   }, [id]);
 
-  const handleDragEnd = (result: any) => {
-    const { source, destination } = result;
-
-    if (!destination) return;
-    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
-
-    const boardsCopy = [...boards];
-    const sourceBoardIndex = boardsCopy.findIndex(board => board.id === parseInt(source.droppableId));
-    const destinationBoardIndex = boardsCopy.findIndex(board => board.id === parseInt(destination.droppableId));
-
-    const [movedCard] = boardsCopy[sourceBoardIndex].cards.splice(source.index, 1);
-    boardsCopy[destinationBoardIndex].cards.splice(destination.index, 0, movedCard);
-
-    setBoards(boardsCopy);
+  const handleDragStart = (cardId: number) => {
+    setCardId(cardId);
   };
+  
+  
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (targetBoardId: number) => {
+    const cardId = getCardId;
+  
+    const targetBoardIndex = boards.findIndex(board => board.id === targetBoardId);
+  
+    if (targetBoardIndex === -1) {
+      return;
+    }
+  
+    const targetBoard = boards[targetBoardIndex];
+  
+    const sourceBoardIndex = boards.findIndex(board => 
+      board.cards.some(card => card.id === cardId)
+    );
+  
+    if (sourceBoardIndex === -1) {
+      return;
+    }
+  
+    const sourceBoard = boards[sourceBoardIndex];
+    const cardIndex = sourceBoard.cards.findIndex(card => card.id === cardId);
+    const [movedCard] = sourceBoard.cards.splice(cardIndex, 1);
+  
+    targetBoard.cards.push(movedCard);
+  
+    setBoards([...boards]);
+  };
+  
 
   const addBoard = async () => {
     const title = prompt("Enter the title for the new board:");
@@ -98,7 +123,6 @@ const Project: React.FC = () => {
       const newBoard = { id: response.data.board_id, title, cards: [] };
       setBoards([...boards, newBoard]);
     } catch (err) {
-      console.error("Error creating the board:", err);
       alert("Unable to create a new board.");
     }
   };
@@ -124,7 +148,6 @@ const Project: React.FC = () => {
         )
       );
     } catch (err) {
-      console.error("Error creating the card:", err);
       alert("Unable to create a new card.");
     }
   };
@@ -145,46 +168,40 @@ const Project: React.FC = () => {
   return (
     <div className="project-container">
       <h1 className="project-title">{projectName}</h1>
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="boards-container">
-          {boards.map((board) => (
-            <Droppable key={board.id} droppableId={String(board.id)}>
-              {(provided) => (
-                <div
-                  className="board"
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  <h2>{board.title}</h2>
-                  <div className="cards-container">
-                    {board.cards.map((card, index) => (
-                      <Draggable key={card.id} draggableId={String(card.id)} index={index}>
-                        {(provided) => (
-                          <div
-                            className="card"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <h3>{card.title}</h3>
-                            <p>{card.description}</p>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
+      <div className="boards-container">
+        {boards.map((board) => (
+          <div
+            key={board.id}
+            className="board"
+            onDragOver={handleDragOver}
+            onDrop={() => handleDrop(board.id)}
+          >
+            <h2>{board.title}</h2>
+            <div className="cards-container">
+              {board.cards.length > 0 ? (
+                board.cards.map((card) => (
+                  <div
+                    key={card.id}
+                    className="card"
+                    draggable
+                    onDragStart={() => handleDragStart(card.id)}
+                  >
+                    <h3>{card.title}</h3>
+                    <p>{card.description}</p>
                   </div>
-                  <button onClick={() => addCard(board.id)} className="add-card-button">
-                    + Add a Card
-                  </button>
-                </div>
+                ))
+              ) : (
+                <p>No cards in this board.</p>
               )}
-            </Droppable>
-          ))}
+              <button onClick={() => addCard(board.id)} className="add-card-button">
+                + Add a Card
+              </button>
+            </div>
+          </div>
+        ))}
+        <div className="add-board-container" onClick={addBoard}>
+          <button className="add-board-button">+ Add a Board</button>
         </div>
-      </DragDropContext>
-      <div className="add-board-container" onClick={addBoard}>
-        <button className="add-board-button">+ Add a Board</button>
       </div>
     </div>
   );
