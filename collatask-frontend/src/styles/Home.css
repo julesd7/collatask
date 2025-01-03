@@ -1,0 +1,73 @@
+/* Home.css */
+
+.home-container {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.home-container .home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    background-color: var(--card-background-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.home-container .header-logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.home-container .header-logo .logo {
+    width: 40px;
+    margin-right: 8px;
+}
+
+.home-container .header-logo .logo-text {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.home-container .create-button {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.home-container .create-button .arrow {
+    margin-left: 5px;
+}
+
+.home-container .links {
+    display: flex;
+    gap: 40px;
+    position: absolute;
+    right: 40px;
+}
+
+.home-container .nav-link {
+    text-decoration: none;
+    color: #333;
+    color: #fff;
+}
+
+.home-container .nav-link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
