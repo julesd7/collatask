@@ -11,6 +11,7 @@
 }
 
 .my-projects-container .my-projects {
+    margin-top: 70px;
     width: 90%;
     max-width: 1200px;
     background: var(--card-background-color);

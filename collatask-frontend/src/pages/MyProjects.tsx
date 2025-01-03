@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 import '../styles/MyProjects.css';
 
@@ -34,6 +35,7 @@ const MyProjects: React.FC = () => {
 
   return (
     <div className="my-projects-container">
+      <Navbar />
       <div className="my-projects">
         <h1>My Projects</h1>
         {projects && projects.length > 0 ? (

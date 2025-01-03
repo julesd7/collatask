@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import '../styles/CreateProject.css';
 
 const ProjectCreator = () => {
@@ -77,6 +78,7 @@ const ProjectCreator = () => {
 
   return (
     <div className="project-creator-container">
+      <Navbar />
       <div className="project-creator-content">
         <div className="project-creator-title">
             Project Creator
