@@ -40,10 +40,13 @@ const Home: React.FC = () => {
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
   
-    if (days > 0) return `${days} days ago`;
-    if (hours > 0) return `${hours} hours ago`;
-    if (minutes > 0) return `${minutes} minutes ago`;
-    return `just now`;
+    return days > 1 ? `${days} days ago` :
+       days === 1 ? `1 day ago` :
+       hours > 1 ? `${hours} hours ago` :
+       hours === 1 ? `1 hour ago` :
+       minutes > 1 ? `${minutes} minutes ago` :
+       minutes === 1 ? `1 minute ago` :
+       `just now`;
   };  
 
   return (
