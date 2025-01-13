@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+import BoardModal from '../components/BoardModal';
+
 import '../styles/Project.css';
 
 interface Card {
@@ -24,8 +26,10 @@ const Project: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [getCardId, setCardId] = useState<number>(0);
   const [getBoardId, setBoardId] = useState<number>(0);
-  const [holding, setHolding] = useState<boolean>(false); // State to track hold action
-  const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null); // Timeout to manage the hold duration
+  const [holding, setHolding] = useState<boolean>(false);
+  const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [BoardModalOpen, setBoardModalOpen] = useState<boolean>(false);
+  const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -162,10 +166,30 @@ const Project: React.FC = () => {
     // TODO: Implement project settings modal
   }
 
-  const handleBoardSettingsClick = (boardId: number) => {
-    alert('Settings clicked for board with id: ' + boardId);
-    // TODO: Implement board settings modal
-  }
+  const handleBoardSettingsClick = (board: Board) => {
+    setSelectedBoard(board);
+    setBoardModalOpen(true);
+  };
+
+  const handleDelete = (boardId: number) => {
+    axios.delete(`${import.meta.env.VITE_APP_URL}/api/boards/${id}/${boardId}`, { withCredentials: true
+    });
+    setBoards((prevBoards) => prevBoards.filter((board) => board.id !== boardId));
+  };
+
+  const handleSaveBoard = (boardId: number, updatedTitle: string) => {
+    setBoards((prevBoards) =>
+      prevBoards.map((board) =>
+        board.id === boardId ? { ...board, title: updatedTitle } : board
+      )
+    );
+
+    axios.put(
+      `${import.meta.env.VITE_APP_URL}/api/boards/${id}/${boardId}`,
+      { title: updatedTitle },
+      { withCredentials: true }
+    );
+  };
 
   const handleCardClick = (cardId: number) => {
     if (!holding) {
@@ -177,16 +201,16 @@ const Project: React.FC = () => {
   const handleCardMouseDown = () => {
     const timeout = setTimeout(() => {
       setHolding(true);
-    }, 500); // Trigger holding if mouse is down for more than 500ms
+    }, 500);
 
     setHoldTimeout(timeout);
   };
 
   const handleCardMouseUp = () => {
     if (holdTimeout) {
-      clearTimeout(holdTimeout); // Clear the timeout if mouse is released before 500ms
+      clearTimeout(holdTimeout);
     }
-    setHolding(false); // Reset holding state on mouseup
+    setHolding(false);
   };
 
   if (loading) {
@@ -221,7 +245,7 @@ const Project: React.FC = () => {
           >
             <div className="board-header">
               <h2>{board.title}</h2>
-              <button className="settings-button-board" onClick={() => handleBoardSettingsClick(board.id)}>⚙️</button>
+              <button className="settings-button-board" onClick={() => handleBoardSettingsClick(board)}>⚙️</button>
             </div>
             <div className="cards-container">
               {board.cards.length > 0 ? (
@@ -252,6 +276,14 @@ const Project: React.FC = () => {
           <button className="add-board-button">+ Add a Board</button>
         </div>
       </div>
+      {BoardModalOpen && selectedBoard && (
+        <BoardModal
+          board={selectedBoard}
+          onClose={() => setBoardModalOpen(false)}
+          onDelete={(boardId) => handleDelete(boardId)}
+          onSave={handleSaveBoard}
+        />
+      )}
     </div>
   );
 };

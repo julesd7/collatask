@@ -24,7 +24,7 @@ router.get('/:project_id', authenticateJWT, async (req, res) => {
     }
 
     try {
-        const boardsResults = await db.select().from(boards).where(eq(boards.project_id, project_id));
+        const boardsResults = await db.select().from(boards).where(eq(boards.project_id, project_id)).orderBy(boards.created_at, 'asc');
 
         if (boardsResults.length === 0) {
             return res.status(404).json({ error: 'No boards found for this project.' });
