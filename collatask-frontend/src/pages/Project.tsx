@@ -1,5 +1,3 @@
-// Project.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -26,13 +24,15 @@ const Project: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [getCardId, setCardId] = useState<number>(0);
   const [getBoardId, setBoardId] = useState<number>(0);
+  const [holding, setHolding] = useState<boolean>(false); // State to track hold action
+  const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null); // Timeout to manage the hold duration
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBoardsAndCards = async () => {
       try {
         const projectResponse = await axios.get(`${import.meta.env.VITE_APP_URL}/api/projects/${id}`, {
-            withCredentials: true,
+          withCredentials: true,
         });
         setProjectName(projectResponse.data.project.title);
 
@@ -75,8 +75,6 @@ const Project: React.FC = () => {
     setCardId(cardId);
     setBoardId(boardId);
   };
-  
-  
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -85,32 +83,30 @@ const Project: React.FC = () => {
   const handleDrop = (targetBoardId: number) => {
     const cardId = getCardId;
     const sourceBoardId = getBoardId;
-  
+
     const targetBoardIndex = boards.findIndex(board => board.id === targetBoardId);
-  
+
     if (targetBoardIndex === -1) {
       return;
     }
-  
+
     const targetBoard = boards[targetBoardIndex];
-  
-    const sourceBoardIndex = boards.findIndex(board => 
+
+    const sourceBoardIndex = boards.findIndex(board =>
       board.cards.some(card => card.id === cardId)
     );
-  
+
     if (sourceBoardIndex === -1) {
       return;
     }
-  
+
     const sourceBoard = boards[sourceBoardIndex];
     const cardIndex = sourceBoard.cards.findIndex(card => card.id === cardId);
     const [movedCard] = sourceBoard.cards.splice(cardIndex, 1);
-  
-    targetBoard.cards.push(movedCard);
-  
-    setBoards([...boards]);
 
-    console.log("Moving card", cardId, "from board", sourceBoardId, "to board", targetBoardId);
+    targetBoard.cards.push(movedCard);
+
+    setBoards([...boards]);
 
     axios.put(
       `${import.meta.env.VITE_APP_URL}/api/cards/move/${id}/${sourceBoardId}/${cardId}`,
@@ -118,7 +114,6 @@ const Project: React.FC = () => {
       { withCredentials: true }
     );
   };
-  
 
   const addBoard = async () => {
     const title = prompt("Enter the title for the new board:");
@@ -162,6 +157,38 @@ const Project: React.FC = () => {
     }
   };
 
+  const handleProjectSettingsClick = (ProjectId: string) => {
+    alert('Settings clicked for project with id: ' + ProjectId);
+    // TODO: Implement project settings modal
+  }
+
+  const handleBoardSettingsClick = (boardId: number) => {
+    alert('Settings clicked for board with id: ' + boardId);
+    // TODO: Implement board settings modal
+  }
+
+  const handleCardClick = (cardId: number) => {
+    if (!holding) {
+      alert('Click on card with id: ' + cardId);
+      // TODO: Implement card details modal
+    }
+  };
+
+  const handleCardMouseDown = () => {
+    const timeout = setTimeout(() => {
+      setHolding(true);
+    }, 500); // Trigger holding if mouse is down for more than 500ms
+
+    setHoldTimeout(timeout);
+  };
+
+  const handleCardMouseUp = () => {
+    if (holdTimeout) {
+      clearTimeout(holdTimeout); // Clear the timeout if mouse is released before 500ms
+    }
+    setHolding(false); // Reset holding state on mouseup
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -182,7 +209,7 @@ const Project: React.FC = () => {
           <span className="arrow">←</span> Home
         </button>
         <h1 className="project-title">{projectName}</h1>
-        <button onClick={() => alert('Settings clicked!')} className="header-button settings-button">Settings ⚙️</button>
+        {id && <button onClick={() => handleProjectSettingsClick(id)} className="header-button settings-button">Settings ⚙️</button>}
       </div>
       <div className="boards-container">
         {boards.map((board) => (
@@ -192,7 +219,10 @@ const Project: React.FC = () => {
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(board.id)}
           >
-            <h2>{board.title}</h2>
+            <div className="board-header">
+              <h2>{board.title}</h2>
+              <button className="settings-button-board" onClick={() => handleBoardSettingsClick(board.id)}>⚙️</button>
+            </div>
             <div className="cards-container">
               {board.cards.length > 0 ? (
                 board.cards.map((card) => (
@@ -201,6 +231,9 @@ const Project: React.FC = () => {
                     className="card"
                     draggable
                     onDragStart={() => handleDragStart(card.id, board.id)}
+                    onMouseDown={handleCardMouseDown}
+                    onMouseUp={handleCardMouseUp}
+                    onClick={() => handleCardClick(card.id)}
                   >
                     <h3>{card.title}</h3>
                     <p>{card.description}</p>
