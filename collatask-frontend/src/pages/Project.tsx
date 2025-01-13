@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import BoardModal from '../components/BoardModal';
+import CardModal from '../components/CardModal';
 
 import '../styles/Project.css';
 
@@ -29,7 +30,9 @@ const Project: React.FC = () => {
   const [holding, setHolding] = useState<boolean>(false);
   const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null);
   const [BoardModalOpen, setBoardModalOpen] = useState<boolean>(false);
+  const [CardModalOpen, setCardModalOpen] = useState<boolean>(false);
   const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -171,7 +174,7 @@ const Project: React.FC = () => {
     setBoardModalOpen(true);
   };
 
-  const handleDelete = (boardId: number) => {
+  const handleBoardDeletion = (boardId: number) => {
     axios.delete(`${import.meta.env.VITE_APP_URL}/api/boards/${id}/${boardId}`, { withCredentials: true
     });
     setBoards((prevBoards) => prevBoards.filter((board) => board.id !== boardId));
@@ -191,11 +194,39 @@ const Project: React.FC = () => {
     );
   };
 
-  const handleCardClick = (cardId: number) => {
+  const handleCardClick = (card: Card) => {
     if (!holding) {
-      alert('Click on card with id: ' + cardId);
-      // TODO: Implement card details modal
+      setSelectedCard(card);
+      if (BoardModalOpen) {
+        setBoardModalOpen(false);
+      }
+      setCardModalOpen(true);
     }
+  };
+
+  const handleCardDeletion = (cardId: number) => {
+    axios.delete(`${import.meta.env.VITE_APP_URL}/api/cards/${id}/${cardId}`, { withCredentials: true });
+    setBoards(prevBoards =>
+      prevBoards.map(board => ({
+        ...board,
+        cards: board.cards.filter(card => card.id !== cardId)
+      }))
+    );
+  };
+
+  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string) => {
+    axios.put(
+      `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${cardId}`,
+      { title: updatedTitle, description: updatedDescription },
+      { withCredentials: true }
+    );
+  
+    setBoards(prevBoards => prevBoards.map(board => ({
+      ...board,
+      cards: board.cards.map(card => 
+        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription } : card
+      ),
+    })));
   };
 
   const handleCardMouseDown = () => {
@@ -257,7 +288,7 @@ const Project: React.FC = () => {
                     onDragStart={() => handleDragStart(card.id, board.id)}
                     onMouseDown={handleCardMouseDown}
                     onMouseUp={handleCardMouseUp}
-                    onClick={() => handleCardClick(card.id)}
+                    onClick={() => handleCardClick(card)}
                   >
                     <h3>{card.title}</h3>
                     <p>{card.description}</p>
@@ -280,8 +311,16 @@ const Project: React.FC = () => {
         <BoardModal
           board={selectedBoard}
           onClose={() => setBoardModalOpen(false)}
-          onDelete={(boardId) => handleDelete(boardId)}
+          onDelete={(boardId) => handleBoardDeletion(boardId)}
           onSave={handleSaveBoard}
+        />
+      )}
+      {CardModalOpen && selectedCard && (
+        <CardModal
+          card={selectedCard}
+          onClose={() => setCardModalOpen(false)}
+          onDelete={(cardId) => handleCardDeletion(cardId)}
+          onSave={handleSaveCard}
         />
       )}
     </div>

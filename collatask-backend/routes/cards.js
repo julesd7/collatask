@@ -140,12 +140,12 @@ router.put('/move/:project_id/:board_id/:card_id', authenticateJWT, roleMiddlewa
 });
 
 // Endpoint to update a card
-router.put('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
-    const { project_id, board_id, card_id } = req.params;
+router.put('/:project_id/:card_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
+    const { project_id, card_id } = req.params;
     const { title, description, start_date, end_date } = req.body;
     const user_id = req.user.id;
 
-    if (!project_id || !board_id || !card_id) {
+    if (!project_id || !card_id) {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
@@ -156,7 +156,7 @@ router.put('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware([]
     const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
 
     if (projectCheck.length === 0) {
-        return res.status(404).json({ error: 'Project, board, or card not found.' });
+        return res.status(404).json({ error: 'Project, or card not found.' });
     }
 
     const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
@@ -165,16 +165,10 @@ router.put('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware([]
         return res.status(404).json({ error: 'User not assigned to this project.' });
     }
 
-    const boardCheck = await db.select().from(boards).where(and(eq(boards.id, board_id), eq(boards.project_id, project_id)));
-
-    if (boardCheck.length === 0) {
-        return res.status(404).json({ error: 'Project, board, or card not found.' });
-    }
-
-    const cardCheck = await db.select().from(cards).where(and(eq(cards.id, card_id), eq(cards.project_id, project_id), eq(cards.board_id, board_id)));
+    const cardCheck = await db.select().from(cards).where(and(eq(cards.id, card_id), eq(cards.project_id, project_id)));
 
     if (cardCheck.length === 0) {
-        return res.status(404).json({ error: 'Project, board, or card not found.' });
+        return res.status(404).json({ error: 'Project, or card not found.' });
     }
 
     try {
@@ -194,11 +188,11 @@ router.put('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware([]
 });
 
 // Endpoint to delete a card
-router.delete('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
-    const { project_id, board_id, card_id } = req.params;
+router.delete('/:project_id/:card_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
+    const { project_id, card_id } = req.params;
     const user_id = req.user.id;
 
-    if (!project_id || !board_id || !card_id) {
+    if (!project_id || !card_id) {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
@@ -212,12 +206,7 @@ router.delete('/:project_id/:board_id/:card_id', authenticateJWT, roleMiddleware
         return res.status(404).json({ error: 'User not assigned to this project.' });
     }
 
-    const boardCheck = await db.select().from(boards).where(and(eq(boards.id, board_id), eq(boards.project_id, project_id)));
-    if (boardCheck.length === 0) {
-        return res.status(404).json({ error: 'Project, board, or card not found.' });
-    }
-
-    const cardCheck = await db.select().from(cards).where(and(eq(cards.id, card_id), eq(cards.project_id, project_id), eq(cards.board_id, board_id)));
+    const cardCheck = await db.select().from(cards).where(and(eq(cards.id, card_id), eq(cards.project_id, project_id)));
     if (cardCheck.length === 0) {
         return res.status(404).json({ error: 'Project, board, or card not found.' });
     }
