@@ -5,7 +5,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import '../styles/Project.css';
-import { get } from 'http';
 
 interface Card {
   id: number;
@@ -26,6 +25,7 @@ const Project: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [getCardId, setCardId] = useState<number>(0);
+  const [getBoardId, setBoardId] = useState<number>(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,8 +71,9 @@ const Project: React.FC = () => {
     fetchBoardsAndCards();
   }, [id]);
 
-  const handleDragStart = (cardId: number) => {
+  const handleDragStart = (cardId: number, boardId: number) => {
     setCardId(cardId);
+    setBoardId(boardId);
   };
   
   
@@ -83,6 +84,7 @@ const Project: React.FC = () => {
 
   const handleDrop = (targetBoardId: number) => {
     const cardId = getCardId;
+    const sourceBoardId = getBoardId;
   
     const targetBoardIndex = boards.findIndex(board => board.id === targetBoardId);
   
@@ -107,6 +109,14 @@ const Project: React.FC = () => {
     targetBoard.cards.push(movedCard);
   
     setBoards([...boards]);
+
+    console.log("Moving card", cardId, "from board", sourceBoardId, "to board", targetBoardId);
+
+    axios.put(
+      `${import.meta.env.VITE_APP_URL}/api/cards/move/${id}/${sourceBoardId}/${cardId}`,
+      { new_board_id: targetBoardId },
+      { withCredentials: true }
+    );
   };
   
 
@@ -184,7 +194,7 @@ const Project: React.FC = () => {
                     key={card.id}
                     className="card"
                     draggable
-                    onDragStart={() => handleDragStart(card.id)}
+                    onDragStart={() => handleDragStart(card.id, board.id)}
                   >
                     <h3>{card.title}</h3>
                     <p>{card.description}</p>
