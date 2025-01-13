@@ -7,15 +7,56 @@
     background-color: var(--background-color);
     min-height: 100vh;
   }
-  
-  /* Title of the Project */
-  .project-container .title {
-    text-align: center;
-    font-size: 32px;
-    color: var(--text-color);
-    margin-bottom: 20px;
+  /* Header Container */
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--card-background-color);
+    border-radius: 27px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
-  
+
+  /* Title Styling */
+  .project-header .project-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-color);
+    text-align: center;
+    flex-grow: 1;
+  }
+
+  /* Header Buttons */
+  .project-header .header-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Hover Effects */
+  .project-header .header-button:hover {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+  }
+
+  /* Specific Button Customization */
+  .project-header .back-button {
+    margin-right: auto;
+  }
+
+  .project-header .settings-button {
+    margin-left: auto;
+  }
+
   /* Container for the Boards */
   .project-container .boards-container {
     display: flex;

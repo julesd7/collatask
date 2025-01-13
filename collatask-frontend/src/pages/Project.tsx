@@ -177,7 +177,13 @@ const Project: React.FC = () => {
 
   return (
     <div className="project-container">
-      <h1 className="project-title">{projectName}</h1>
+      <div className="project-header">
+        <button onClick={() => navigate('/')} className="header-button back-button">
+          <span className="arrow">←</span> Home
+        </button>
+        <h1 className="project-title">{projectName}</h1>
+        <button onClick={() => alert('Settings clicked!')} className="header-button settings-button">Settings ⚙️</button>
+      </div>
       <div className="boards-container">
         {boards.map((board) => (
           <div
