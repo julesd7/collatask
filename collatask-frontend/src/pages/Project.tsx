@@ -6,38 +6,16 @@ import ProjectModal from '../components/ProjectModal';
 import BoardModal from '../components/BoardModal';
 import CardModal from '../components/CardModal';
 
+import { ProjectI, BoardI, CardI } from '../utils/interfaces';
+
 import '../styles/Project.css';
-
-interface Card {
-  id: number;
-  title: string;
-  description: string;
-}
-
-interface Board {
-  id: number;
-  title: string;
-  cards: Card[];
-}
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  newTeamMembers: TeamMember[];
-}
-
-interface TeamMember {
-  email: string;
-  role: string;
-}
 
 const Project: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [projectName, setProjectName] = useState<string>('');
   const [projectDescription, setProjectDescription] = useState<string>('');
   const [teamMembers, setProjectsMembers] = useState<{ email: string; role: string }[]>([]);
-  const [boards, setBoards] = useState<Board[]>([]);
+  const [boards, setBoards] = useState<BoardI[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [getCardId, setCardId] = useState<number>(0);
@@ -47,9 +25,9 @@ const Project: React.FC = () => {
   const [ProjectModalOpen, setProjectModalOpen] = useState<boolean>(false);
   const [BoardModalOpen, setBoardModalOpen] = useState<boolean>(false);
   const [CardModalOpen, setCardModalOpen] = useState<boolean>(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectI | null>(null);
+  const [selectedBoard, setSelectedBoard] = useState<BoardI | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CardI | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,7 +44,7 @@ const Project: React.FC = () => {
         });
 
         const boardsWithCards = await Promise.all(
-          boardsResponse.data.map(async (board: Board) => {
+          boardsResponse.data.map(async (board: BoardI) => {
             try {
               const cardsResponse = await axios.get(
                 `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${board.id}`,
@@ -230,7 +208,7 @@ const Project: React.FC = () => {
   };
 
 
-  const handleBoardSettingsClick = (board: Board) => {
+  const handleBoardSettingsClick = (board: BoardI) => {
     setSelectedBoard(board);
     setBoardModalOpen(true);
   };
@@ -255,7 +233,7 @@ const Project: React.FC = () => {
     );
   };
 
-  const handleCardClick = (card: Card) => {
+  const handleCardClick = (card: CardI) => {
     if (!holding) {
       setSelectedCard(card);
       if (BoardModalOpen) {

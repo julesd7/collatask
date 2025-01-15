@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 
-import '../styles/Modal.css';
+import { BoardModalProps } from '../utils/interfaces';
 
-interface BoardModalProps {
-  board: { id: number; title: string;};
-  onSave: (boardId: number, title: string) => void;
-  onDelete: (boardId: number) => void;
-  onClose: () => void;
-}
+import '../styles/Modal.css';
 
 const BoardModal: React.FC<BoardModalProps> = ({ board, onSave, onDelete, onClose }) => {
     const [title, setTitle] = useState(board.title);

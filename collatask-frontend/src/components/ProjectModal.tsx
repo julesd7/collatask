@@ -1,23 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+import { ProjectModalProps, TeamMember } from '../utils/interfaces';
+
 import '../styles/Modal.css';
-
-interface TeamMember {
-  email: string;
-  role: string;
-}
-
-interface ProjectModalProps {
-  project: { 
-    id: string; 
-    title: string; 
-    description: string; 
-    newTeamMembers: TeamMember[];
-  };
-  onSave: (projectId: string, title: string, description: string, teamMembers: TeamMember[]) => void;
-  onDelete: (projectId: string) => void;
-  onClose: () => void;
-}
 
 const ProjectModal: React.FC<ProjectModalProps> = ({ project, onSave, onDelete, onClose }) => {
   const [title, setTitle] = useState<string>(project.title);
