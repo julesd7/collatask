@@ -1,109 +1,187 @@
 /* Modal Styles */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-overlay .modal-content {
-    background-color: #fff;
-    width: 400px;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .modal-overlay .modal-header {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 15px;
-  }
-  
-  .modal-overlay .modal-body {
-    width: 100%;
-  }
-  
-  .modal-overlay .input-field {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .modal-overlay .input-field:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  
-  .modal-overlay .modal-footer {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 15px;
-  }
-  
-  .modal-overlay .modal-footer button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s;
-  }
-  
-  .modal-overlay .modal-footer button.cancel-btn {
-    background-color: #e2e6ea;
-    color: #333;
-  }
-  
-  .modal-overlay .modal-footer button.cancel-btn:hover {
-    background-color: #c6c8ca;
-  }
-  
-  .modal-overlay .modal-footer button.save-btn {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .modal-overlay .modal-footer button.save-btn:hover {
-    background-color: #0056b3;
-  }
-  
-  .modal-overlay .modal-footer button.delete-btn {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .modal-overlay .modal-footer button.delete-btn:hover {
-    background-color: #c82333;
-  }
-  
-  .modal-overlay .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: #333;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: color 0.3s;
-  }
-  
-  .modal-overlay .close-btn:hover {
-    color: #dc3545;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-overlay .modal-content {
+  background-color: #fff;
+  width: 400px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-overlay .modal-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.modal-overlay .modal-body {
+  width: 100%;
+}
+
+.modal-overlay .input-field {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modal-overlay .input-field:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+  /* Team Members Section */
+.modal-overlay .team-members {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.modal-overlay .team-members h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Team Member List */
+.modal-overlay .team-member {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-overlay .team-member {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-overlay .team-members input[type="email"],
+.modal-overlay .team-members select {
+  flex: 1;
+  margin-right: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modal-overlay .team-members input[type="email"]:focus,
+.modal-overlay .team-members select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.modal-overlay .team-members .remove-member {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+  margin-left: auto;
+}
+
+.modal-overlay .team-members .remove-member:hover {
+  background-color: #c82333;
+}
+
+/* Add Member Button */
+.modal-overlay .add-member-btn {
+  margin-top: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+  display: block;
+}
+
+.modal-overlay .add-member-btn:hover {
+  background-color: #218838;
+}
+
+/* Modal Footer */
+.modal-overlay .modal-footer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.modal-overlay .modal-footer button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.modal-overlay .modal-footer button.cancel-btn {
+  background-color: #e2e6ea;
+  color: #333;
+}
+
+.modal-overlay .modal-footer button.cancel-btn:hover {
+  background-color: #c6c8ca;
+}
+
+.modal-overlay .modal-footer button.save-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.modal-overlay .modal-footer button.save-btn:hover {
+  background-color: #0056b3;
+}
+
+.modal-overlay .modal-footer button.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.modal-overlay .modal-footer button.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.modal-overlay .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.modal-overlay .close-btn:hover {
+  color: #dc3545;
+}

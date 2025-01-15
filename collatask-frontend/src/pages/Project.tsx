@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+import ProjectModal from '../components/ProjectModal';
 import BoardModal from '../components/BoardModal';
 import CardModal from '../components/CardModal';
 
@@ -19,9 +20,23 @@ interface Board {
   cards: Card[];
 }
 
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  newTeamMembers: TeamMember[];
+}
+
+interface TeamMember {
+  email: string;
+  role: string;
+}
+
 const Project: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [projectName, setProjectName] = useState<string>('');
+  const [projectDescription, setProjectDescription] = useState<string>('');
+  const [teamMembers, setProjectsMembers] = useState<{ email: string; role: string }[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,8 +44,10 @@ const Project: React.FC = () => {
   const [getBoardId, setBoardId] = useState<number>(0);
   const [holding, setHolding] = useState<boolean>(false);
   const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [ProjectModalOpen, setProjectModalOpen] = useState<boolean>(false);
   const [BoardModalOpen, setBoardModalOpen] = useState<boolean>(false);
   const [CardModalOpen, setCardModalOpen] = useState<boolean>(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const navigate = useNavigate();
@@ -42,6 +59,7 @@ const Project: React.FC = () => {
           withCredentials: true,
         });
         setProjectName(projectResponse.data.project.title);
+        setProjectDescription(projectResponse.data.project.description);
 
         const boardsResponse = await axios.get(`${import.meta.env.VITE_APP_URL}/api/boards/${id}`, {
           withCredentials: true,
@@ -164,10 +182,53 @@ const Project: React.FC = () => {
     }
   };
 
-  const handleProjectSettingsClick = (ProjectId: string) => {
-    alert('Settings clicked for project with id: ' + ProjectId);
-    // TODO: Implement project settings modal
-  }
+  const retreiveProjectMembers = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/project-assignments/${id}`, { withCredentials: true });
+      setProjectsMembers(response.data.users);
+    } catch (err) {
+      alert("Error S1P2: Unable to retrieve project members.");
+    }
+  };
+
+  const handleProjectSettingsClick = () => {
+    if (id) {
+      retreiveProjectMembers();
+      setSelectedProject({
+        id: id,
+        title: projectName,
+        description: projectDescription,
+        newTeamMembers: teamMembers,
+      });
+      setProjectModalOpen(true);
+    } else {
+      alert("Error S1P1: Unable to open project settings.");
+    }
+  };
+
+  const handleProjectDeletion = (projectId: string) => {
+    // TODO: Implement project deletion
+  };
+
+  const handleSaveProject = (cardId: string, updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
+    const newUsers = updatedTeamMembers.filter(
+      (updatedMember) => !teamMembers.some((member) => member.email === updatedMember.email)
+    );
+
+    const removedUsers = teamMembers.filter(
+      (member) => !updatedTeamMembers.some((updatedMember) => updatedMember.email === member.email)
+    );
+
+    const modifiedUsers = updatedTeamMembers.filter((updatedMember) => {
+      const existingMember = teamMembers.find((member) => member.email === updatedMember.email);
+      return existingMember && existingMember.role !== updatedMember.role;
+    });
+
+    console.log('New Users:', newUsers);
+    console.log('Removed Users:', removedUsers);
+    console.log('Modified Users:', modifiedUsers);
+  };
+
 
   const handleBoardSettingsClick = (board: Board) => {
     setSelectedBoard(board);
@@ -264,7 +325,7 @@ const Project: React.FC = () => {
           <span className="arrow">←</span> Home
         </button>
         <h1 className="project-title">{projectName}</h1>
-        {id && <button onClick={() => handleProjectSettingsClick(id)} className="header-button settings-button">Settings ⚙️</button>}
+        {id && <button onClick={() => handleProjectSettingsClick()} className="header-button settings-button">Settings ⚙️</button>}
       </div>
       <div className="boards-container">
         {boards.map((board) => (
@@ -307,6 +368,14 @@ const Project: React.FC = () => {
           <button className="add-board-button">+ Add a Board</button>
         </div>
       </div>
+      {ProjectModalOpen && selectedProject && (
+        <ProjectModal
+          project={selectedProject}
+          onClose={() => setProjectModalOpen(false)}
+          onDelete={(projectId) => handleProjectDeletion(projectId)}
+          onSave={handleSaveProject}
+        />
+      )}
       {BoardModalOpen && selectedBoard && (
         <BoardModal
           board={selectedBoard}
