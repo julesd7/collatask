@@ -33,7 +33,7 @@ router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
         const cardsResult = await db.select().from(cards).where(and(eq(cards.project_id, project_id), eq(cards.board_id, board_id)));
 
         if (cardsResult.length === 0) {
-            return res.status(404).json({ error: 'No cards found for this project and board.' });
+            return res.status(204).send();
         }
         res.status(200).json(cardsResult);
     } catch (error) {

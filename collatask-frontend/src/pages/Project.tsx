@@ -66,9 +66,9 @@ const Project: React.FC = () => {
         } else {
           setError("Error while loading the boards.");
         }
-      } finally {
-        setLoading(false);
       }
+      retreiveProjectMembers();
+      setLoading(false);
     };
 
     fetchBoardsAndCards();
@@ -166,12 +166,12 @@ const Project: React.FC = () => {
       setProjectsMembers(response.data.users);
     } catch (err) {
       alert("Error S1P2: Unable to retrieve project members.");
+      console.error("Error S1P2: Unable to retrieve project members.");
     }
   };
 
   const handleProjectSettingsClick = () => {
     if (id) {
-      retreiveProjectMembers();
       setSelectedProject({
         id: id,
         title: projectName,
@@ -181,6 +181,7 @@ const Project: React.FC = () => {
       setProjectModalOpen(true);
     } else {
       alert("Error S1P1: Unable to open project settings.");
+      console.error("Error S1P1: Unable to open project settings.");
     }
   };
 
@@ -188,15 +189,21 @@ const Project: React.FC = () => {
     // TODO: Implement project deletion
   };
 
-  const handleSaveProject = (cardId: string, updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
+  const handleSaveProject = (projectId: string, updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
+    axios.put(
+      `${import.meta.env.VITE_APP_URL}/api/projects/${id}`,
+      { title: updatedTitle, description: updatedDescription },
+      { withCredentials: true }
+    ).then(() => {
+      window.location.reload();
+    });
+
     const newUsers = updatedTeamMembers.filter(
       (updatedMember) => !teamMembers.some((member) => member.email === updatedMember.email)
     );
-
     const removedUsers = teamMembers.filter(
       (member) => !updatedTeamMembers.some((updatedMember) => updatedMember.email === member.email)
     );
-
     const modifiedUsers = updatedTeamMembers.filter((updatedMember) => {
       const existingMember = teamMembers.find((member) => member.email === updatedMember.email);
       return existingMember && existingMember.role !== updatedMember.role;
