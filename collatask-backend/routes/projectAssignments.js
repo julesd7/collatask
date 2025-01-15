@@ -8,6 +8,31 @@ const { eq, and, sql } = require('drizzle-orm');
 const { projects, users, projectAssignments } = require('../models');
 const { db } = require('../db');
 
+// Get all users assigned to a project
+router.get('/:project_id', authenticateJWT, async (req, res) => {
+    const { project_id } = req.params;
+    const userId = req.user.id;
+
+    try {
+        const projectCheck = await db.select().from(projects).where(eq(projects.id, project_id));
+        if (projectCheck.length === 0) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        const roleCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, userId), eq(projectAssignments.project_id, project_id)));
+        if (roleCheck.length === 0) {
+            return res.status(403).json({ error: 'Forbidden access.' });
+        }
+
+        const result = await db.select({ email: users.email, role: projectAssignments.role }).from(users).innerJoin(projectAssignments, and(eq(users.id, projectAssignments.user_id), eq(projectAssignments.project_id, project_id)));
+        res.status(200).json({ users: result });
+
+    } catch (error) {
+        console.error('Error getting project users', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Assign project to user
 router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
     const { project_id } = req.params;
