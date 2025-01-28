@@ -14,6 +14,7 @@ import Reset from './pages/Reset';
 import CreateProject from './pages/CreateProject';
 import MyProjects from './pages/MyProjects';
 import Project from './pages/Project';
+import Contact from './pages/Contact';
 
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -59,6 +60,7 @@ const AppRouter: React.FC = () => {
       <Route path="/create-project" element={isConnected ? <CreateProject /> : <Navigate to="/forbidden" />} />
       <Route path="/my-projects" element={isConnected ? <MyProjects /> : <Navigate to="/forbidden" />} />
       <Route path="/project/:id" element={isConnected ? <Project /> : <Navigate to="/forbidden" />} />
+      <Route path="/contact" element={isConnected ? <Contact /> : <Navigate to="/forbidden" />} />
 
       <Route path='*' element={<NotFound />} />
     </Routes>

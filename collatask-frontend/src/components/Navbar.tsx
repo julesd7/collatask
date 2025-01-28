@@ -1,6 +1,6 @@
 // Navbar.tsx
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import chatIcon from '../assets/chat_icon.png';
@@ -10,6 +10,7 @@ import '../styles/Navbar.css';
 import { useState } from 'react';
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const [isProfileMenuOpen, setProfileMenuState] = useState(false);
@@ -57,7 +58,7 @@ const Navbar: React.FC = () => {
       </div>
       <div className="right-section">
         <div className="contact">
-          <img src={chatIcon} alt="Contact" />
+          <img src={chatIcon} alt="Contact" onClick={() => navigate('/contact')} />
         </div>
         <div className="user-profile">
           <img src={userProfileIcon} alt="User Profile" onClick={toggleProfileMenu} />
