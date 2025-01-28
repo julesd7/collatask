@@ -14,7 +14,7 @@ router.get('/', authenticateJWT, async (req, res) => {
 
     try {
         const result = await db.select({id: projects.id, title: projects.title, description: projects.description}).from(projects).innerJoin(
-            projectAssignments, eq(projectAssignments.project_id, projects.id)).where(eq(projectAssignments.user_id, userId));
+            projectAssignments, eq(projectAssignments.project_id, projects.id)).where(eq(projectAssignments.user_id, userId)).orderBy(sql`${projects.updated_at} DESC`);
         if (result.length === 0) {
             return res.status(404).json({ error: 'No projects found for this user' });
         }
