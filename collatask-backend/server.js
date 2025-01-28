@@ -12,6 +12,7 @@ const userProjectsRoutes = require('./routes/userProjects');
 const cardRoutes = require('./routes/cards');
 const cardAssignmentRoutes = require('./routes/cardAssignments');
 const boardRoutes = require('./routes/boards');
+const contactRoutes = require('./routes/contact');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/api/user-projects', userProjectsRoutes);
 app.use('/api/cards', cardRoutes);
 app.use('/api/card-assignments', cardAssignmentRoutes);
 app.use('/api/boards', boardRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
