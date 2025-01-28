@@ -50,12 +50,12 @@ const Project: React.FC = () => {
                 `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${board.id}`,
                 { withCredentials: true }
               );
-              return { ...board, cards: cardsResponse.data };
+              return { ...board, cards: cardsResponse.data || [] };
             } catch (err: any) {
               return { ...board, cards: [] };
             }
           })
-        );
+        );        
 
         setBoards(boardsWithCards);
       } catch (err: any) {
@@ -86,42 +86,46 @@ const Project: React.FC = () => {
   const handleDrop = (targetBoardId: number) => {
     const cardId = getCardId;
     const sourceBoardId = getBoardId;
-
+  
     const targetBoardIndex = boards.findIndex(board => board.id === targetBoardId);
-
+  
     if (targetBoardIndex === -1) {
       return;
     }
-
+  
     const targetBoard = boards[targetBoardIndex];
-
+  
     const sourceBoardIndex = boards.findIndex(board =>
       board.cards.some(card => card.id === cardId)
     );
-
+  
     if (sourceBoardIndex === -1) {
       return;
     }
-
+  
     const sourceBoard = boards[sourceBoardIndex];
     const cardIndex = sourceBoard.cards.findIndex(card => card.id === cardId);
     const [movedCard] = sourceBoard.cards.splice(cardIndex, 1);
-
+  
+    if (!Array.isArray(targetBoard.cards)) {
+      targetBoard.cards = [];
+    }
+  
     targetBoard.cards.push(movedCard);
-
+  
     setBoards([...boards]);
-
+  
     axios.put(
       `${import.meta.env.VITE_APP_URL}/api/cards/move/${id}/${sourceBoardId}/${cardId}`,
       { new_board_id: targetBoardId },
       { withCredentials: true }
     );
-  };
+  };  
 
   const addBoard = async () => {
     const title = prompt("Enter the title for the new board:");
     if (!title) return;
-
+  
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_APP_URL}/api/boards/${id}`,
@@ -133,7 +137,7 @@ const Project: React.FC = () => {
     } catch (err) {
       alert("Unable to create a new board.");
     }
-  };
+  };  
 
   const addCard = async (boardId: number) => {
     const title = prompt("Enter the title for the new card:");
