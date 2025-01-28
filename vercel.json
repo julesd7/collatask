@@ -15,8 +15,8 @@
     ],
     "routes": [
       {
-        "src": "/api/(.*)",
-        "dest": "/collatask-backend/api/$1"
+        "src": "/routes/(.*)",
+        "dest": "/collatask-backend/routes/$1"
       },
       {
         "src": "/(.*)",
