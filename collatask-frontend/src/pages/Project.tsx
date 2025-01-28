@@ -189,8 +189,9 @@ const Project: React.FC = () => {
     }
   };
 
-  const handleProjectDeletion = (projectId: string) => {
-    // TODO: Implement project deletion
+  const handleProjectDeletion = () => {
+    axios.delete(`${import.meta.env.VITE_APP_URL}/api/projects/${id}`, { withCredentials: true });
+    navigate('/');
   };
 
   const handleSaveProject = (projectId: string, updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
@@ -361,7 +362,7 @@ const Project: React.FC = () => {
         <ProjectModal
           project={selectedProject}
           onClose={() => setProjectModalOpen(false)}
-          onDelete={(projectId) => handleProjectDeletion(projectId)}
+          onDelete={() => handleProjectDeletion()}
           onSave={handleSaveProject}
         />
       )}
