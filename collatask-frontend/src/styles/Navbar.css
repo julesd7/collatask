@@ -130,7 +130,12 @@
 
 .navbar .user-profile-menu li {
     padding: 8px 16px;
+    border-bottom: 1px solid #000000;
     cursor: pointer;
+}
+
+.navbar .user-profile-menu li:last-child {
+    border-bottom: none;
 }
 
 .navbar .user-profile-menu li:hover {

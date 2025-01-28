@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
           {isProfileMenuOpen && (
             <div className="user-profile-menu">
               <ul>
-                {/* <li onClick={() => console.log("Go to Profile")}>Profile</li> */}
+                <li onClick={() => console.log("Go to Profile")}>Profile</li>
                 <li onClick={() => handleSignOut()}>Logout</li>
               </ul>
             </div>
