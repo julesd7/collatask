@@ -204,7 +204,7 @@ const Project: React.FC = () => {
     navigate('/');
   };
 
-  const handleSaveProject = (projectId: string, updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
+  const handleSaveProject = (updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
     axios
       .put(
         `${import.meta.env.VITE_APP_URL}/api/projects/${id}`,

@@ -35,7 +35,6 @@ interface ProjectModalProps {
     newTeamMembers: TeamMember[];
   };
   onSave: (
-    projectId: string,
     title: string,
     description: string,
     teamMembers: TeamMember[]

@@ -33,7 +33,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onSave, onDelete, 
   };
 
   const handleSave = () => {
-    onSave(project.id, title, description, newTeamMembers);
+    onSave(title, description, newTeamMembers);
     onClose();
   };
 
