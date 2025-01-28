@@ -78,6 +78,7 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
             project_id: project_id,
             role: userRole,
         }).returning();
+        await db.update(projects).set({updated_at: sql`NOW()`}).where(eq(projects.id, project_id));
         res.status(201).json({ message: 'Project assigned successfully', assignment: result[0] });
     } catch (error) {
         console.error('Error assigning project', error);
@@ -142,6 +143,7 @@ router.put('/role/:project_id', authenticateJWT, async (req, res) => {
         }
 
         await db.update(projectAssignments).set({role: role}).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+        await db.update(projects).set({updated_at: sql`NOW()`}).where(eq(projects.id, project_id));
         res.status(200).json({ message: 'User role updated successfully.' });
     } catch (error) {
         console.error('Error updating user role', error);
@@ -193,6 +195,7 @@ router.delete('/remove/:project_id', authenticateJWT, async (req, res) => {
         }
 
         await db.delete(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
+        await db.update(projects).set({updated_at: sql`NOW()`}).where(eq(projects.id, project_id));
         res.status(200).json({ message: 'User removed successfully.' });
     } catch (error) {
         console.error('Error removing user from project', error);

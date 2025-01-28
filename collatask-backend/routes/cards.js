@@ -5,7 +5,7 @@ const { roleMiddleware } = require('../middleware/roleMiddleware');
 const router = express.Router();
 
 // drizzle
-const { eq, and } = require('drizzle-orm');
+const { eq, and, sql } = require('drizzle-orm');
 const { cards, projects, boards, projectAssignments } = require('../models');
 const { db } = require('../db');
 
@@ -132,6 +132,7 @@ router.put('/move/:project_id/:board_id/:card_id', authenticateJWT, roleMiddlewa
 
     try {
         await db.update(cards).set({ board_id: newBoardUUID }).where(eq(cards.id, card_id));
+        await db.update(projects).set({updated_at: sql`NOW()`}).where(eq(projects.id, project_id));
         res.status(200).json({ message: 'Card moved successfully.' });
     } catch (error) {
         console.error('Error moving card', error);
