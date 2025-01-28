@@ -1,0 +1,27 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "collatask-frontend/package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "dist"
+        }
+      },
+      {
+        "src": "collatask-backend/package.json",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "/collatask-backend/api/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/collatask-frontend/$1"
+      }
+    ]
+  }
+  
