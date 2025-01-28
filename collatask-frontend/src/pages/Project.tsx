@@ -215,7 +215,6 @@ const Project: React.FC = () => {
         window.location.reload();
       });
   
-    // Comparer avec les données du localStorage
     const previousRoles = JSON.parse(localStorage.getItem(`project-${id}-roles`) || '[]');
     
     const newUsers = updatedTeamMembers.filter(
