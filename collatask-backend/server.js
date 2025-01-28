@@ -13,6 +13,7 @@ const cardRoutes = require('./routes/cards');
 const cardAssignmentRoutes = require('./routes/cardAssignments');
 const boardRoutes = require('./routes/boards');
 const contactRoutes = require('./routes/contact');
+const helloRoute = require('./routes/hello');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/hello', helloRoute);
 app.use('/api/user', accountRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/project-assignments', projectAssignmentRoutes);
