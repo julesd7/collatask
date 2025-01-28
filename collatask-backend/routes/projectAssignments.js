@@ -88,15 +88,11 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
 // Change user role in project
 router.put('/role/:project_id', authenticateJWT, async (req, res) => {
     const { project_id } = req.params;
-    const { user_id, role } = req.body;
+    const { email, role } = req.body;
     const requesterId = req.user.id;
 
-    if (!user_id || !project_id || !role) {
+    if (!email || !project_id || !role) {
         return res.status(400).json({ error: 'Missing information.' });
-    }
-
-    if (user_id === requesterId) {
-        return res.status(403).json({ error: 'You cannot change your own role.' });
     }
 
     try {
@@ -104,39 +100,47 @@ router.put('/role/:project_id', authenticateJWT, async (req, res) => {
         if (projectCheck.length === 0) {
             return res.status(404).json({ error: 'Project not found' });
         }
-    
+
         const roleCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, requesterId), eq(projectAssignments.project_id, project_id)));
         if (roleCheck.length === 0) {
             return res.status(403).json({ error: 'Forbidden access.' });
-        };
+        }
 
         const requesterRole = roleCheck[0].role;
         if (requesterRole !== 'owner' && requesterRole !== 'admin') {
             return res.status(403).json({ error: 'Forbidden access.' });
-        };
+        }
 
-        if (role === 'owner' && requesterRole !== 'owner') {
-            return res.status(403).json({ error: 'Forbidden access.' });
-        };
+        const userCheck = await db.select({id: users.id}).from(users).where(eq(users.email, email));
+        if (userCheck.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user_id = userCheck[0].id;
+
+        if (user_id === requesterId) {
+            return res.status(403).json({ error: 'You cannot change your own role.' });
+        }
 
         const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
         if (existingAssignment.length === 0) {
             return res.status(404).json({ error: 'User not assigned to this project.' });
-        };
+        }
 
-        if (role === 'admin' && requesterRole !== 'owner') {
+        if (role === 'owner' && requesterRole !== 'owner') {
             return res.status(403).json({ error: 'Forbidden access.' });
-        };
+        }
 
         const ownerCheck = await db.select({role: projectAssignments.role}).from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
         if ((ownerCheck[0].role === 'owner' || ownerCheck[0].role === 'admin') && requesterRole !== 'owner') {
             return res.status(403).json({ error: 'You cannot change the role of the project administrators' });
-        };
+        }
 
         if (role === 'owner' && requesterRole === 'owner') {
             await db.update(projectAssignments).set({role: 'admin'}).where(and(eq(projectAssignments.user_id, requesterId), eq(projectAssignments.project_id, project_id)));
             await db.update(projects).set({owner_id: user_id, updated_at: sql`NOW()`}).where(eq(projects.id, project_id));
         }
+
         await db.update(projectAssignments).set({role: role}).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
         res.status(200).json({ message: 'User role updated successfully.' });
     } catch (error) {
@@ -148,10 +152,10 @@ router.put('/role/:project_id', authenticateJWT, async (req, res) => {
 // Remove user from project
 router.delete('/remove/:project_id', authenticateJWT, async (req, res) => {
     const { project_id } = req.params;
-    const { user_id } = req.body;
+    const { email } = req.body;
     const requesterId = req.user.id;
 
-    if (!user_id || !project_id) {
+    if (!email || !project_id) {
         return res.status(400).json({ error: 'Missing parameter.' });
     }
 
@@ -170,6 +174,13 @@ router.delete('/remove/:project_id', authenticateJWT, async (req, res) => {
         if (requesterRole !== 'owner' && requesterRole !== 'admin') {
             return res.status(403).json({ error: 'Forbidden access.' });
         }
+
+        const userCheck = await db.select({id: users.id}).from(users).where(eq(users.email, email));
+        if (userCheck.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user_id = userCheck[0].id;
 
         const existingAssignment = await db.select().from(projectAssignments).where(and(eq(projectAssignments.user_id, user_id), eq(projectAssignments.project_id, project_id)));
         if (existingAssignment.length === 0) {
