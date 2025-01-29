@@ -22,7 +22,7 @@ import Login from './pages/Login';
 import './styles/Global.css';
 
 const AppRouter: React.FC = () => {
-  const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean | null>(false);
 
   useEffect(() => {
     const checkConnection = async () => {
