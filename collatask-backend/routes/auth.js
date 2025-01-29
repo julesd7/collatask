@@ -118,7 +118,7 @@ router.post('/login', async (req, res) => {
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+            secure: process.env.NODE_ENV === 'HTTPS', // Use HTTPS in production
             maxAge: 1 * 24 * 60 * 60 * 1000,
         });
 
@@ -126,7 +126,7 @@ router.post('/login', async (req, res) => {
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+            secure: process.env.NODE_ENV === 'HTTPS', // Use HTTPS in production
             maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 30 days or 7 days
         });
 
@@ -156,7 +156,7 @@ router.post('/refresh-token', (req, res) => {
             const newAccessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
             res.cookie('accessToken', newAccessToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+                secure: process.env.NODE_ENV === 'HTTPS', // Use HTTPS in production
                 maxAge: 1 * 24 * 60 * 60 * 1000,
             });
 
