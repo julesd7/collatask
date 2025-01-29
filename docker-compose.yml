@@ -11,6 +11,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`api.collatask.com`)"
       - "traefik.http.services.backend.loadbalancer.server.port=3000"
+    ports:
+        - "3000:3000"
     networks:
       - app_network
 
@@ -22,6 +24,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`collatask.com`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
+    ports:
+        - "80:80"
     networks:
       - app_network
 
