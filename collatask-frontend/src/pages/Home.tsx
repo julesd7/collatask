@@ -25,8 +25,8 @@ const Home: React.FC = () => {
   React.useEffect(() => {
     const fetchProjects = async () => {
       const projects = await getRecentlyUpdatedProjects();
-      setRecentProjects(projects);
-    };
+      setRecentProjects(Array.isArray(projects) ? projects : []);
+    };    
 
     fetchProjects();
   }, []);
@@ -60,19 +60,23 @@ const Home: React.FC = () => {
         <div className="recently-update-projects">
           <h2>Recently Updated Projects</h2>
           <ul>
-            {recentProjects.slice(0, 3).map((project: any) => (
-              <li key={project.id} className="project-item">
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-                <button
-                  onClick={() => navigate(`/project/${project.id}`)}
-                  className="view-button"
-                >
-                  View Project
-                </button>
-                <p className="last-updated">Last updated: {timeSinceLastUpdate(project.updated_at)}</p>
-              </li>
-            ))}
+            {Array.isArray(recentProjects) && recentProjects.length > 0 ? (
+              recentProjects.slice(0, 3).map((project: any) => (
+                <li key={project.id} className="project-item">
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <button
+                    onClick={() => navigate(`/project/${project.id}`)}
+                    className="view-button"
+                  >
+                    View Project
+                  </button>
+                  <p className="last-updated">Last updated: {timeSinceLastUpdate(project.updated_at)}</p>
+                </li>
+              ))
+            ) : (
+              <p>No recent projects available.</p>
+            )}
           </ul>
         </div>
       </div>
