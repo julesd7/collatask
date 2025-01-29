@@ -11,7 +11,7 @@ export default defineConfig({
       usePolling: true,
     },
     allowedHosts: [
-        "*"
+        "n0skcskcoc048wgggkggsgo8.49.12.229.147.sslip.io"
       ],
   },
 });
