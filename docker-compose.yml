@@ -1,48 +1,50 @@
+version: '3.8'
+
 services:
   backend:
     build:
       context: ./collatask-backend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
     environment:
-      - PORT=${PORT}
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - DB_PORT=${DB_PORT}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-      - APP_URL=${APP_URL}
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-      - EMAIL_JWT_SECRET=${EMAIL_JWT_SECRET}
-      - FRONTEND_URL=${FRONTEND_URL}
-    depends_on:
-      - db
+      - PORT=3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.collatask.com`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
+    networks:
+      - app_network
 
   frontend:
     build:
       context: ./collatask-frontend
       dockerfile: Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`collatask.com`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+    networks:
+      - app_network
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--api.insecure=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--certificatesresolvers.myresolver.acme.httpChallenge.entryPoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=jules@collatask.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/etc/letsencrypt/acme.json"
     ports:
       - "80:80"
-    environment:
-      - VITE_APP_URL=${VITE_APP_URL}
-
-  db:
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "5432:5432"
+      - "443:443"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./structure.sql:/docker-entrypoint-initdb.d/structure.sql
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/etc/letsencrypt"
+    networks:
+      - app_network
 
-volumes:
-  pgdata:
+networks:
+  app_network:
+    driver: bridge
