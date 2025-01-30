@@ -62,15 +62,9 @@ const Home: React.FC = () => {
           <ul>
             {Array.isArray(recentProjects) && recentProjects.length > 0 ? (
               recentProjects.slice(0, 3).map((project: any) => (
-                <li key={project.id} className="project-item">
+                <li key={project.id} className="project-item" onClick={() => navigate(`/project/${project.id}`)}>
                   <h3>{project.title}</h3>
-                  <p>{project.description}</p>
-                  <button
-                    onClick={() => navigate(`/project/${project.id}`)}
-                    className="view-button"
-                  >
-                    View Project
-                  </button>
+                  <p className="description">{project.description}</p>
                   <p className="last-updated">Last updated: {timeSinceLastUpdate(project.updated_at)}</p>
                 </li>
               ))

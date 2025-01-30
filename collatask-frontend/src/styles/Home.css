@@ -45,6 +45,12 @@
     margin: 0;
 }
 
+.home-container .recently-update-projects p {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
 .home-container .project-item {
     padding: 20px 25px;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -52,6 +58,11 @@
     margin-bottom: 20px;
     background-color: var(--card-background-color);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
+    text-align: center; /* Centre tout le contenu */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
 }
 
 .home-container .project-item:hover {
@@ -65,10 +76,11 @@
     color: var(--accent-color);
 }
 
-.home-container .project-item p {
+.home-container .project-item .description {
     margin: 0 0 10px;
     font-size: 1.2rem;
     line-height: 1.6;
+    color: #ccc
 }
 
 .home-container .view-button {
@@ -88,7 +100,8 @@
 }
 
 .home-container .last-updated {
-    font-size: 1rem;
+    font-size: 1rem !important;
     color: var(--text-color);
     margin-top: 10px;
+    font-style: italic;
 }
