@@ -19,6 +19,11 @@ const Navbar: React.FC = () => {
     setProfileMenuState((previous: boolean) => !previous);
   };
 
+  const handleProfile = () => {
+    navigate('/profile');
+    setProfileMenuState(false);
+  };
+
   const handleSignOut = async () => {
       try {
         await axios.post(`${import.meta.env.VITE_APP_URL}/api/auth/logout`, {}, {
@@ -65,7 +70,7 @@ const Navbar: React.FC = () => {
           {isProfileMenuOpen && (
             <div className="user-profile-menu">
               <ul>
-                <li onClick={() => console.log("Go to Profile")}>Profile</li>
+                <li onClick={() => handleProfile()}>Profile</li>
                 <li onClick={() => handleSignOut()}>Logout</li>
               </ul>
             </div>
