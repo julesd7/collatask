@@ -1,7 +1,7 @@
 // Login.tsx
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Auth.css';
 
@@ -9,14 +9,25 @@ import Logo from '../assets/logo_white_500x500.png';
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const [token, setToken] = useState<string>('');
+    useEffect(() => {
+        const tokenParam = searchParams.get('token');
+        if (tokenParam) {
+            setToken(tokenParam);
+        }
+    }, [searchParams]);
+
     const [identifier, setIdentifier] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [rememberMe, setRememberMe] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
+    const [message, setMessage] = useState<string>('');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setMessage('');
         setError('');
         setIsLoading(true);
     
@@ -43,10 +54,10 @@ const Login: React.FC = () => {
             }
 
         } catch (error) {
-            const errorMessage = (error as any).response?.data?.message || 'An error occurred.';
+            const errorMessage = (error as any).response?.data?.error || 'An error occurred.';
             
             if ((error as any).response?.status === 403 || (error as any).response?.status === 401) {
-                const conflictMessage = (error as any).response?.data?.message || 'Email or password is invalid.';
+                const conflictMessage = (error as any).response?.data?.error || 'Email or password is invalid.';
                 setError(conflictMessage);
             } else {
                 setError(errorMessage);
@@ -55,6 +66,33 @@ const Login: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        const verifyEmail = async () => {
+            if (!token) return;
+
+            setMessage('');
+            setError('Please wait while we verify your email...');
+
+            try {
+                const response = await axios.post(
+                    `${import.meta.env.VITE_APP_URL}/api/auth/verify-email`,
+                    { token }
+                );
+
+                if (response.status === 200) {
+                    setMessage('Email verified. Please login.');
+                    setError('');
+                    setToken('');
+                }
+            } catch (error) {
+                console.error(error);
+                setError('Email verification failed.');
+            }
+        };
+
+        verifyEmail();
+    }, [token]);
 
     return (
         <div className='signup-container'>
@@ -102,6 +140,7 @@ const Login: React.FC = () => {
                         <p>Don't have an account? <span onClick={() => navigate('/signup')}>Sign up</span></p>
                     </div>
                 </form>
+                {message && <p className='success-message'>{message}</p>}
                 {error && <p className='error-message'>{error}</p>}
             </div>
         </div>
