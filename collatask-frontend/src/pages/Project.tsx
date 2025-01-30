@@ -43,6 +43,12 @@ const Project: React.FC = () => {
           withCredentials: true,
         });
 
+        if (boardsResponse.data.length === 0) {
+          setBoards([]);
+          setLoading(false);
+          return;
+        }
+
         const boardsWithCards = await Promise.all(
           boardsResponse.data.map(async (board: BoardI) => {
             try {
