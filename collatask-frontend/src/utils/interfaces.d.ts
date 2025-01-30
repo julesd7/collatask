@@ -62,4 +62,10 @@ interface CardModalProps {
   onClose: () => void;
 }
 
-export { CardI, BoardI, ProjectI, TeamMember, ProjectModalProps, BoardModalProps, BoardCreationModalProps, CardModalProps };
+interface CardCreationModalProps {
+  boardId: number;
+  onSave: (boardId: number, title: string, description: string) => void;
+  onClose: () => void;
+}
+
+export { CardI, BoardI, ProjectI, TeamMember, ProjectModalProps, BoardModalProps, BoardCreationModalProps, CardModalProps, CardCreationModalProps };
