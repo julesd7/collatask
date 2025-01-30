@@ -47,12 +47,16 @@ router.post('/register', async (req, res) => {
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.zoho.eu',
-            port: 465,
-            secure: true,
+            port: 587,
+            secure: false, // STARTTLS → `secure: false`
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASSWORD,
             },
+            connectionTimeout: 15000,
+            tls: {
+                rejectUnauthorized: false,
+            }
         });
 
         const mailOptions = {
@@ -202,12 +206,16 @@ router.post('/reset', async (req, res) => {
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.zoho.eu',
-            port: 465,
-            secure: true,
+            port: 587,
+            secure: false, // STARTTLS → `secure: false`
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASSWORD,
             },
+            connectionTimeout: 15000,
+            tls: {
+                rejectUnauthorized: false,
+            }
         });
 
         const mailOptions = {
