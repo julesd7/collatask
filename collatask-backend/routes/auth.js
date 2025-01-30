@@ -21,25 +21,31 @@ router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-        return res.status(400).json({ error: 'All fields are required' });
+        return res.status(400).json({ error: 'All fields are required.' });
     }
+
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (!usernameRegex.test(username)) {
+        return res.status(400).json({ error: 'Username can only contain letters and numbers.' });
+    }
+    const usernameLower = username.toLowerCase();
 
     try {
         const userCheck = await db.select().from(users).where(
             or(
-                eq(users.username, username),
+                eq(users.username, usernameLower),
                 eq(users.email, email)
             )
         );
 
         if (userCheck.length > 0) {
-            return res.status(409).json({ error: 'Username or email already exists' });
+            return res.status(409).json({ error: 'Username or email already exists.' });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = jwt.sign({ email }, process.env.EMAIL_JWT_SECRET, { expiresIn: '1h' });
 
         const result = await db.insert(users).values({
-            username: username,
+            username: usernameLower,
             email: email,
             password: hashedPassword,
             verification_token: verificationToken
@@ -79,7 +85,7 @@ router.post('/register', async (req, res) => {
 
     } catch (error) {
         console.error('Error registering user', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error.' });
     }
 });
 
@@ -92,17 +98,20 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ error: 'All fields are required.' });
     }
 
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const identifierLower = isEmail ? identifier : identifier.toLowerCase();
+
     try {
         const result = await db.select().from(users).where(
             or(
-                eq(users.username, identifier),
-                eq(users.email, identifier)
+                eq(users.username, identifierLower),
+                eq(users.email, identifierLower)
             )
         );
         const user = result[0];
 
         if (!user) {
-            console.error('User not found with identifier:', identifier);
+            console.error('User not found with identifier:', identifierLower);
             return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
