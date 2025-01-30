@@ -6,6 +6,7 @@ import ProjectModal from '../components/ProjectModal';
 import BoardModal from '../components/BoardModal';
 import BoardCreationModal from '../components/BoardCreationModal';
 import CardModal from '../components/CardModal';
+import CardCreationModal from '../components/CardCreationModal';
 
 import { ProjectI, BoardI, CardI } from '../utils/interfaces';
 
@@ -27,6 +28,7 @@ const Project: React.FC = () => {
   const [BoardModalOpen, setBoardModalOpen] = useState<boolean>(false);
   const [BoardCreationModalOpen, setBoardCreationModalOpen] = useState<boolean>(false);
   const [CardModalOpen, setCardModalOpen] = useState<boolean>(false);
+  const [CardCreationModalOpen, setCardCreationModalOpen] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<ProjectI | null>(null);
   const [selectedBoard, setSelectedBoard] = useState<BoardI | null>(null);
   const [selectedCard, setSelectedCard] = useState<CardI | null>(null);
@@ -137,31 +139,6 @@ const Project: React.FC = () => {
       { withCredentials: true }
     );
   };  
-
-  const addCard = async (boardId: number) => {
-    const title = prompt("Enter the title for the new card:");
-    if (!title) return;
-
-    const description = prompt("Enter the description of the card (optional):");
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
-        { title, description },
-        { withCredentials: true }
-      );
-
-      const newCard = { id: response.data.card_id, title, description: description || "" };
-
-      setBoards((prevBoards) =>
-        prevBoards.map((board) =>
-          board.id === boardId ? { ...board, cards: [...board.cards, newCard] } : board
-        )
-      );
-    } catch (err) {
-      alert("Unable to create a new card.");
-    }
-  };
 
   const retreiveProjectMembers = async () => {
     try {
@@ -324,6 +301,34 @@ const Project: React.FC = () => {
     })));
   };
 
+  const handleCardCreation = async (boardId: number, title: string, description: string) => {
+    setCardCreationModalOpen(false);
+    if (!title) return;
+  
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
+        { title, description },
+        { withCredentials: true }
+      );
+
+      const newCard = { id: response.data.card_id, title, description: description || "" };
+
+      setBoards((prevBoards) =>
+        prevBoards.map((board) =>
+          board.id === boardId ? { ...board, cards: [...board.cards, newCard] } : board
+        )
+      );
+    } catch (err) {
+      alert("Unable to create a new card.");
+    }
+  };
+
+  const handleCardCreationClick = (boardId: number) => {
+    setCardCreationModalOpen(true);
+    setBoardId(boardId);
+  };
+
   const handleCardMouseDown = () => {
     const timeout = setTimeout(() => {
       setHolding(true);
@@ -392,7 +397,7 @@ const Project: React.FC = () => {
               ) : (
                 <p>No cards in this board.</p>
               )}
-              <button onClick={() => addCard(board.id)} className="add-card-button">
+              <button onClick={() => handleCardCreationClick(board.id)} className="add-card-button">
                 + Add a Card
               </button>
             </div>
@@ -430,6 +435,13 @@ const Project: React.FC = () => {
           onClose={() => setCardModalOpen(false)}
           onDelete={(cardId) => handleCardDeletion(cardId)}
           onSave={handleSaveCard}
+        />
+      )}
+      {CardCreationModalOpen && (
+        <CardCreationModal
+          boardId={getBoardId}
+          onClose={() => setCardCreationModalOpen(false)}
+          onSave={handleCardCreation}
         />
       )}
     </div>
