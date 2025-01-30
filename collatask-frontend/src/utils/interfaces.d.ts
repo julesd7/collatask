@@ -50,6 +50,11 @@ interface BoardModalProps {
   onClose: () => void;
 }
 
+interface BoardCreationModalProps {
+  onSave: (title: string) => void;
+  onClose: () => void;
+}
+
 interface CardModalProps {
   card: { id: number; title: string; description: string };
   onSave: (cardId: number, title: string, description: string) => void;
@@ -57,4 +62,4 @@ interface CardModalProps {
   onClose: () => void;
 }
 
-export { CardI, BoardI, ProjectI, TeamMember, ProjectModalProps, BoardModalProps, CardModalProps };
+export { CardI, BoardI, ProjectI, TeamMember, ProjectModalProps, BoardModalProps, BoardCreationModalProps, CardModalProps };
