@@ -36,7 +36,7 @@ const Home: React.FC = () => {
     const lastUpdate = new Date(date);
     const diffInSeconds = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
     
-    const minutes = Math.floor(diffInSeconds / 60) + 60;
+    const minutes = Math.floor(diffInSeconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
   
@@ -47,7 +47,7 @@ const Home: React.FC = () => {
        minutes > 1 ? `${minutes} minutes ago` :
        minutes === 1 ? `1 minute ago` :
        `just now`;
-  };  
+  };
 
   return (
     <div className="home-container">
@@ -62,15 +62,9 @@ const Home: React.FC = () => {
           <ul>
             {Array.isArray(recentProjects) && recentProjects.length > 0 ? (
               recentProjects.slice(0, 3).map((project: any) => (
-                <li key={project.id} className="project-item">
+                <li key={project.id} className="project-item" onClick={() => navigate(`/project/${project.id}`)}>
                   <h3>{project.title}</h3>
-                  <p>{project.description}</p>
-                  <button
-                    onClick={() => navigate(`/project/${project.id}`)}
-                    className="view-button"
-                  >
-                    View Project
-                  </button>
+                  <p className="description">{project.description}</p>
                   <p className="last-updated">Last updated: {timeSinceLastUpdate(project.updated_at)}</p>
                 </li>
               ))

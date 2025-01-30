@@ -1,0 +1,59 @@
+/* Profile.css */
+
+.profile-container {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 70px;
+    width: 90%;
+    max-width: 600px;
+    background: var(--card-background-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+}
+
+.profile-content h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.profile-card {
+    width: 100%;
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.profile-card strong {
+    font-weight: bold;
+}
+
+.home-button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.home-button:hover {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    transform: translateY(-3px);
+}

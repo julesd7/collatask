@@ -4,7 +4,9 @@ import axios from 'axios';
 
 import ProjectModal from '../components/ProjectModal';
 import BoardModal from '../components/BoardModal';
+import BoardCreationModal from '../components/BoardCreationModal';
 import CardModal from '../components/CardModal';
+import CardCreationModal from '../components/CardCreationModal';
 
 import { ProjectI, BoardI, CardI } from '../utils/interfaces';
 
@@ -24,7 +26,9 @@ const Project: React.FC = () => {
   const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null);
   const [ProjectModalOpen, setProjectModalOpen] = useState<boolean>(false);
   const [BoardModalOpen, setBoardModalOpen] = useState<boolean>(false);
+  const [BoardCreationModalOpen, setBoardCreationModalOpen] = useState<boolean>(false);
   const [CardModalOpen, setCardModalOpen] = useState<boolean>(false);
+  const [CardCreationModalOpen, setCardCreationModalOpen] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<ProjectI | null>(null);
   const [selectedBoard, setSelectedBoard] = useState<BoardI | null>(null);
   const [selectedCard, setSelectedCard] = useState<CardI | null>(null);
@@ -42,6 +46,13 @@ const Project: React.FC = () => {
         const boardsResponse = await axios.get(`${import.meta.env.VITE_APP_URL}/api/boards/${id}`, {
           withCredentials: true,
         });
+
+        if (boardsResponse.data.length === 0) {
+          setBoards([]);
+          retreiveProjectMembers();
+          setLoading(false);
+          return;
+        }
 
         const boardsWithCards = await Promise.all(
           boardsResponse.data.map(async (board: BoardI) => {
@@ -129,48 +140,6 @@ const Project: React.FC = () => {
     );
   };  
 
-  const addBoard = async () => {
-    const title = prompt("Enter the title for the new board:");
-    if (!title) return;
-  
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_APP_URL}/api/boards/${id}`,
-        { title },
-        { withCredentials: true }
-      );
-      const newBoard = { id: response.data.board_id, title, cards: [] };
-      setBoards([...boards, newBoard]);
-    } catch (err) {
-      alert("Unable to create a new board.");
-    }
-  };  
-
-  const addCard = async (boardId: number) => {
-    const title = prompt("Enter the title for the new card:");
-    if (!title) return;
-
-    const description = prompt("Enter the description of the card (optional):");
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
-        { title, description },
-        { withCredentials: true }
-      );
-
-      const newCard = { id: response.data.card_id, title, description: description || "" };
-
-      setBoards((prevBoards) =>
-        prevBoards.map((board) =>
-          board.id === boardId ? { ...board, cards: [...board.cards, newCard] } : board
-        )
-      );
-    } catch (err) {
-      alert("Unable to create a new card.");
-    }
-  };
-
   const retreiveProjectMembers = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/project-assignments/${id}`, { withCredentials: true });
@@ -202,6 +171,7 @@ const Project: React.FC = () => {
     axios.delete(`${import.meta.env.VITE_APP_URL}/api/projects/${id}`, { withCredentials: true });
     localStorage.removeItem(`project-${id}-roles`);
     navigate('/');
+    window.location.reload();
   };
 
   const handleSaveProject = (updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
@@ -279,6 +249,23 @@ const Project: React.FC = () => {
     );
   };
 
+  const handleBoardCreation = async (title: string) => {
+    setBoardCreationModalOpen(false);
+    if (!title) return;
+  
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_URL}/api/boards/${id}`,
+        { title },
+        { withCredentials: true }
+      );
+      const newBoard = { id: response.data.board_id, title, cards: [] };
+      setBoards([...boards, newBoard]);
+    } catch (err) {
+      alert("Unable to create a new board.");
+    }
+  };
+
   const handleCardClick = (card: CardI) => {
     if (!holding) {
       setSelectedCard(card);
@@ -314,6 +301,34 @@ const Project: React.FC = () => {
     })));
   };
 
+  const handleCardCreation = async (boardId: number, title: string, description: string) => {
+    setCardCreationModalOpen(false);
+    if (!title) return;
+  
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
+        { title, description },
+        { withCredentials: true }
+      );
+
+      const newCard = { id: response.data.card_id, title, description: description || "" };
+
+      setBoards((prevBoards) =>
+        prevBoards.map((board) =>
+          board.id === boardId ? { ...board, cards: [...board.cards, newCard] } : board
+        )
+      );
+    } catch (err) {
+      alert("Unable to create a new card.");
+    }
+  };
+
+  const handleCardCreationClick = (boardId: number) => {
+    setCardCreationModalOpen(true);
+    setBoardId(boardId);
+  };
+
   const handleCardMouseDown = () => {
     const timeout = setTimeout(() => {
       setHolding(true);
@@ -337,7 +352,7 @@ const Project: React.FC = () => {
     return (
       <div>
         <p>{error}</p>
-        <button onClick={addBoard}>Create a Board</button>
+        <button onClick={() => setBoardCreationModalOpen(true)}>Create a Board</button>
       </div>
     );
   }
@@ -382,13 +397,13 @@ const Project: React.FC = () => {
               ) : (
                 <p>No cards in this board.</p>
               )}
-              <button onClick={() => addCard(board.id)} className="add-card-button">
+              <button onClick={() => handleCardCreationClick(board.id)} className="add-card-button">
                 + Add a Card
               </button>
             </div>
           </div>
         ))}
-        <div className="add-board-container" onClick={addBoard}>
+        <div className="add-board-container" onClick={() => setBoardCreationModalOpen(true)}>
           <button className="add-board-button">+ Add a Board</button>
         </div>
       </div>
@@ -408,12 +423,25 @@ const Project: React.FC = () => {
           onSave={handleSaveBoard}
         />
       )}
+      {BoardCreationModalOpen && (
+        <BoardCreationModal
+          onClose={() => setBoardCreationModalOpen(false)}
+          onSave={handleBoardCreation}
+        />
+      )}
       {CardModalOpen && selectedCard && (
         <CardModal
           card={selectedCard}
           onClose={() => setCardModalOpen(false)}
           onDelete={(cardId) => handleCardDeletion(cardId)}
           onSave={handleSaveCard}
+        />
+      )}
+      {CardCreationModalOpen && (
+        <CardCreationModal
+          boardId={getBoardId}
+          onClose={() => setCardCreationModalOpen(false)}
+          onSave={handleCardCreation}
         />
       )}
     </div>

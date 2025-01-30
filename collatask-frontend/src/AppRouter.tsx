@@ -15,6 +15,7 @@ import CreateProject from './pages/CreateProject';
 import MyProjects from './pages/MyProjects';
 import Project from './pages/Project';
 import Contact from './pages/Contact';
+import Profile from './pages/Profile';
 
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -22,7 +23,7 @@ import Login from './pages/Login';
 import './styles/Global.css';
 
 const AppRouter: React.FC = () => {
-  const [isConnected, setIsConnected] = useState<boolean | null>(false);
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -50,17 +51,18 @@ const AppRouter: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={isConnected ? <Home /> : <Welcome />} />
+      <Route path="/" element={isConnected == true ? <Home /> : <Welcome />} />
       <Route path="/about" element={<About />} />
-      <Route path="/signup" element={isConnected ? <Navigate to="/" /> : <Signup />} />
-      <Route path="/login" element={isConnected ? <Navigate to="/" /> : <Login />} />
-      <Route path="/reset" element={isConnected ? <Navigate to="/" /> : <Reset />} />
+      <Route path="/signup" element={isConnected == true ? <Navigate to="/" /> : <Signup />} />
+      <Route path="/login" element={isConnected == true ? <Navigate to="/" /> : <Login />} />
+      <Route path="/reset" element={isConnected == true ? <Navigate to="/" /> : <Reset />} />
       <Route path="/forbidden" element={<Fordidden />} />
 
-      <Route path="/create-project" element={isConnected ? <CreateProject /> : <Navigate to="/forbidden" />} />
-      <Route path="/my-projects" element={isConnected ? <MyProjects /> : <Navigate to="/forbidden" />} />
-      <Route path="/project/:id" element={isConnected ? <Project /> : <Navigate to="/forbidden" />} />
-      <Route path="/contact" element={isConnected ? <Contact /> : <Navigate to="/forbidden" />} />
+      <Route path="/create-project" element={isConnected == true ? <CreateProject /> : <Navigate to="/forbidden" />} />
+      <Route path="/my-projects" element={isConnected == true ? <MyProjects /> : <Navigate to="/forbidden" />} />
+      <Route path="/project/:id" element={isConnected == true ? <Project /> : <Navigate to="/forbidden" />} />
+      <Route path="/contact" element={isConnected == true ? <Contact /> : <Navigate to="/forbidden" />} />
+      <Route path="/profile" element={isConnected == true ? <Profile /> : <Navigate to="/forbidden" />} />
 
       <Route path='*' element={<NotFound />} />
     </Routes>
