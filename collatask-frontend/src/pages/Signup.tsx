@@ -52,10 +52,10 @@ const Signup: React.FC = () => {
             }, 5000);
 
         } catch (error) {
-            const errorMessage = (error as any).response?.data?.message || 'An error occurred.';
+            const errorMessage = (error as any).response?.data?.error || 'An error occurred.';
             
             if ((error as any).response?.status === 409) {
-                const conflictMessage = (error as any).response?.data?.message || 'Username or email already exists.';
+                const conflictMessage = (error as any).response?.data?.error || 'Username or email already exists.';
                 setError(conflictMessage);
             } else {
                 setError(errorMessage);
