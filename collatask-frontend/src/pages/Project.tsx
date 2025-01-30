@@ -209,6 +209,7 @@ const Project: React.FC = () => {
     axios.delete(`${import.meta.env.VITE_APP_URL}/api/projects/${id}`, { withCredentials: true });
     localStorage.removeItem(`project-${id}-roles`);
     navigate('/');
+    window.location.reload();
   };
 
   const handleSaveProject = (updatedTitle: string, updatedDescription: string, updatedTeamMembers: { email: string; role: string }[]) => {
