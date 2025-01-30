@@ -5,11 +5,13 @@ import axios from 'axios';
 import '../styles/Profile.css';
 
 import Navbar from '../components/Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
+    const navigate = useNavigate();
+    const [user, setUser] = useState<{ username: string; email: string } | null>(null);
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/user/me`, {
@@ -34,7 +36,7 @@ const Profile: React.FC = () => {
             <p><strong>Username:</strong> {user.username}</p>
             <p><strong>Email:</strong> {user.email}</p>
             <p><br /><br /><em>In the next update,<br />it will be possible to change your information.</em></p>
-            <button className="home-button">Home</button>
+            <button className="home-button" onClick={() => navigate('/')}>Home</button>
           </div>
         ) : (
           <p>Loading...</p>
