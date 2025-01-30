@@ -36,7 +36,7 @@ const Home: React.FC = () => {
     const lastUpdate = new Date(date);
     const diffInSeconds = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
     
-    const minutes = Math.floor(diffInSeconds / 60) + 60;
+    const minutes = Math.floor(diffInSeconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
   
@@ -47,7 +47,7 @@ const Home: React.FC = () => {
        minutes > 1 ? `${minutes} minutes ago` :
        minutes === 1 ? `1 minute ago` :
        `just now`;
-  };  
+  };
 
   return (
     <div className="home-container">
