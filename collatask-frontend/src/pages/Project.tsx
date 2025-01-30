@@ -45,6 +45,7 @@ const Project: React.FC = () => {
 
         if (boardsResponse.data.length === 0) {
           setBoards([]);
+          retreiveProjectMembers();
           setLoading(false);
           return;
         }
