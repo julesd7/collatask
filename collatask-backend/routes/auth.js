@@ -69,7 +69,7 @@ router.post('/register', async (req, res) => {
             from: process.env.EMAIL_USER,
             to: email,
             subject: 'Please verify your email address',
-            text: `Click on the link to verify your email: ${process.env.APP_URL}/api/auth/verify-email?token=${verificationToken}`,
+            text: `Click on the link to verify your email: ${process.env.FRONTEND_URL}/login?token=${verificationToken}`,
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
@@ -288,8 +288,12 @@ router.post('/reset-password', async (req, res) => {
 });
 
 // Route for verifying email
-router.get('/verify-email', async (req, res) => {
-    const { token } = req.query;
+router.post('/verify-email', async (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return res.status(400).json({ error: 'Verification token is required.' });
+    }
 
     try {
         const decoded = jwt.verify(token, process.env.EMAIL_JWT_SECRET);
