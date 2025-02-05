@@ -9,7 +9,7 @@ import '../styles/CreateProject.css';
 const ProjectCreator = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [teamMembers, setTeamMembers] = useState([{ email: '', role: '' }]);
+  const [teamMembers, setTeamMembers] = useState<{ email: string; role: string }[]>([]);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -96,7 +96,11 @@ const ProjectCreator = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-
+          {teamMembers.length > 0 && (
+            <div className="team-members-header">
+              <h3>Team Members</h3>
+            </div>
+          )}
           {teamMembers.map((member, index) => (
             <div key={index} className="team-member">
               <input
@@ -128,8 +132,8 @@ const ProjectCreator = () => {
             </div>
           ))}
 
-          <button type="button" onClick={handleAddMember}>
-            +
+          <button type="button" onClick={handleAddMember} className="add-member">
+            Add Team Member
           </button>
 
           <button type="submit" disabled={isLoading}>
