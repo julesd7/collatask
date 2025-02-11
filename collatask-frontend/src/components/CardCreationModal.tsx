@@ -7,6 +7,8 @@ import '../styles/Modal.css';
 const BoardModal: React.FC<CardCreationModalProps> = ({ boardId, onSave, onClose }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
 
     if (boardId === undefined) {
         console.error('boardId is undefined');
@@ -14,7 +16,7 @@ const BoardModal: React.FC<CardCreationModalProps> = ({ boardId, onSave, onClose
     }
 
     const handleSave = () => {
-        onSave(boardId, title, description);
+        onSave(boardId, title, description, startDate, endDate);
         onClose();
     };
 
@@ -37,6 +39,26 @@ const BoardModal: React.FC<CardCreationModalProps> = ({ boardId, onSave, onClose
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Card Description (optional)"
+          />
+          <label>Start Date</label>
+          <input
+            className="input-field"
+            type="date"
+            onChange={(e) => {
+              const newStartDate = e.target.value ? new Date(e.target.value) : null;
+              setStartDate(newStartDate);
+                if (newStartDate && endDate && newStartDate > endDate) {
+                setEndDate(null);
+                (document.querySelector('input[type="date"][min]') as HTMLInputElement).value = '';
+                }
+            }}
+          />
+          <label>Due Date</label>
+          <input
+            className="input-field"
+            type="date"
+            onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : null)}
+            min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
           />
         </div>
         <div className="modal-footer">
