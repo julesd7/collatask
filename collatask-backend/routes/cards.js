@@ -45,7 +45,7 @@ router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
 // Endpoint to create a new card
 router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
     const { project_id, board_id } = req.params;
-    const { title, description, start_date, end_date } = req.body;
+    const { title, description, startDate, endDate } = req.body;
     const user_id = req.user.id;
 
     if (!project_id || !board_id || !title) {
@@ -72,12 +72,12 @@ router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewe
 
     try {
         const result = await db.insert(cards).values({
-                project_id: project_id,
-                board_id: board_id,
-                title: title,
-                description: description,
-                start_date: start_date,
-                end_date: end_date
+            project_id: project_id,
+            board_id: board_id,
+            title: title,
+            description: description,
+            start_date: startDate ? new Date(startDate) : null,
+            end_date: endDate ? new Date(endDate) : null
             }
         ).returning({ id: cards.id });    
 
@@ -143,14 +143,14 @@ router.put('/move/:project_id/:board_id/:card_id', authenticateJWT, roleMiddlewa
 // Endpoint to update a card
 router.put('/:project_id/:card_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
     const { project_id, card_id } = req.params;
-    const { title, description, start_date, end_date } = req.body;
+    const { title, description, startDate, endDate } = req.body;
     const user_id = req.user.id;
 
     if (!project_id || !card_id) {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
-    if (!title && !description && !start_date && !end_date) {
+    if (!title && !description && !startDate && !endDate) {
         return res.status(204).send();
     }
 
@@ -174,10 +174,10 @@ router.put('/:project_id/:card_id', authenticateJWT, roleMiddleware([],['viewer'
 
     try {
         await db.update(cards).set({
-                title: title,
-                description: description,
-                start_date: start_date,
-                end_date: end_date
+            title: title,
+            description: description,
+            start_date: startDate ? new Date(startDate) : null,
+            end_date: endDate ? new Date(endDate) : null
             }
         ).where(eq(cards.id, card_id));
 
