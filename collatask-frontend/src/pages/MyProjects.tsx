@@ -49,14 +49,14 @@ const MyProjects: React.FC = () => {
             >
               <h2>{project.title}</h2>
               <p>{project.description}</p>
-              <button
+              <p
                 onClick={(event) => {
                   event.stopPropagation();
                   navigate(`/project/${project.id}`);
                 }}
-                className="view-button">
+                className="view-text">
                 View Project
-              </button>
+              </p>
             </li>
           ))}
         </ul>        

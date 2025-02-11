@@ -12,7 +12,7 @@
 
 .my-projects-container .my-projects {
     margin-top: 70px;
-    width: 90%;
+    width: 70%;
     max-width: 1200px;
     background: var(--card-background-color);
     border-radius: 10px;
@@ -29,6 +29,7 @@
 }
 
 .my-projects-container .my-projects ul {
+    text-align: center;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -58,6 +59,18 @@
     margin: 0 0 10px;
     font-size: 1.2rem;
     line-height: 1.6;
+    color: #ccc;
+}
+
+.my-projects-container p.view-text {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.my-projects-container p.view-text:hover {
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .my-projects-container .view-button,
