@@ -232,7 +232,7 @@ CREATE TABLE public.users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     username character varying(50) NOT NULL,
     email character varying(100) NOT NULL,
-    password character varying(255) NOT NULL,
+    password character varying(255),
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     verified boolean DEFAULT false,
     verification_token character varying(255),

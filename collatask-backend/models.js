@@ -15,7 +15,7 @@ const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   username: varchar('username', { length: 50 }).notNull().unique(),
   email: varchar('email', { length: 100 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
+  password: varchar('password', { length: 255 }),
   created_at: timestamp('created_at').defaultNow(),
   verified: boolean('verified').default(false),
   verification_token: varchar('verification_token', { length: 255 }),

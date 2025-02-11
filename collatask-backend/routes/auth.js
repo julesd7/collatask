@@ -123,6 +123,11 @@ router.post('/login', async (req, res) => {
             return res.status(403).json({ error: 'Please verify your email before logging in.' });
         }
 
+        if (user.password === null) {
+            console.error('User registered via Google:', user.username);
+            return res.status(401).json({ error: 'Please log in via Google.' });
+        }
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             console.error('Password does not match for user:', user.username);
