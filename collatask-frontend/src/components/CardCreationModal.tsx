@@ -4,7 +4,7 @@ import { CardCreationModalProps } from '../utils/interfaces';
 
 import '../styles/Modal.css';
 
-const BoardModal: React.FC<CardCreationModalProps> = ({ boardId, onSave, onClose }) => {
+const CardCreationModal: React.FC<CardCreationModalProps> = ({ boardId, onSave, onClose }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState<Date | null>(null);
@@ -70,4 +70,4 @@ const BoardModal: React.FC<CardCreationModalProps> = ({ boardId, onSave, onClose
   );
 };
 
-export default BoardModal;
+export default CardCreationModal;

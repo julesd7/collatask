@@ -4,21 +4,21 @@ import { CardModalProps } from '../utils/interfaces';
 
 import '../styles/Modal.css';
 
-const BoardModal: React.FC<CardModalProps> = ({ card, onSave, onDelete, onClose }) => {
-    const [title, setTitle] = useState(card.title);
-    const [description, setDescription] = useState(card.description);
-    const [startDate, setStartDate] = useState<Date | null>(card.startDate);
-    const [endDate, setEndDate] = useState<Date | null>(card.endDate);
+const CardModal: React.FC<CardModalProps> = ({ card, onSave, onDelete, onClose }) => {
+  const [title, setTitle] = useState(card.title);
+  const [description, setDescription] = useState(card.description);
+  const [startDate, setStartDate] = useState<Date | null>(card.startDate ? new Date(card.startDate) : null);
+  const [endDate, setEndDate] = useState<Date | null>(card.endDate ? new Date(card.endDate) : null);
 
-    const handleSave = () => {
-        onSave(card.id, title, description, startDate, endDate);
-        onClose();
-    };
+  const handleSave = () => {
+    onSave(card.id, title, description, startDate, endDate);
+    onClose();
+  };
 
-    const handleDelete = () => {
-        onClose();
-        onDelete(card.id);
-    }
+  const handleDelete = () => {
+    onClose();
+    onDelete(card.id);
+  }
 
   return (
     <div className="modal-overlay">
@@ -41,22 +41,24 @@ const BoardModal: React.FC<CardModalProps> = ({ card, onSave, onDelete, onClose 
             placeholder="Card Description"
           />
           <label>Start Date</label>
-            <input
+          <input
             className="input-field"
             type="date"
+            value={startDate ? startDate.toISOString().split('T')[0] : ''}
             onChange={(e) => {
               const newStartDate = e.target.value ? new Date(e.target.value) : null;
               setStartDate(newStartDate);
-                if (newStartDate && endDate && newStartDate > endDate) {
+              if (newStartDate && endDate && newStartDate > endDate) {
                 setEndDate(null);
                 (document.querySelector('input[type="date"][min]') as HTMLInputElement).value = '';
-                }
+              }
             }}
-            />
+          />
           <label>Due Date</label>
           <input
             className="input-field"
             type="date"
+            value={endDate ? endDate.toISOString().split('T')[0] : ''}
             onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : null)}
             min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
           />
@@ -71,4 +73,4 @@ const BoardModal: React.FC<CardModalProps> = ({ card, onSave, onDelete, onClose 
   );
 };
 
-export default BoardModal;
+export default CardModal;

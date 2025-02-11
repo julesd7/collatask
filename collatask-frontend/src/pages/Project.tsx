@@ -53,20 +53,27 @@ const Project: React.FC = () => {
           setLoading(false);
           return;
         }
-
         const boardsWithCards = await Promise.all(
           boardsResponse.data.map(async (board: BoardI) => {
             try {
               const cardsResponse = await axios.get(
-                `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${board.id}`,
-                { withCredentials: true }
+          `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${board.id}`,
+          { withCredentials: true }
               );
-              return { ...board, cards: cardsResponse.data || [] };
+              const cardsWithDates = cardsResponse.data.map((card: any) => {
+            const newCard = {
+              ...card,
+              startDate: card.start_date ? new Date(card.start_date) : null,
+              endDate: card.end_date ? new Date(card.end_date) : null,
+            };
+          return newCard;
+              });
+              return { ...board, cards: cardsWithDates || [] };
             } catch (err: any) {
               return { ...board, cards: [] };
             }
           })
-        );        
+        );
 
         setBoards(boardsWithCards);
       } catch (err: any) {
