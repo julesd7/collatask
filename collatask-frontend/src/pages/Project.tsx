@@ -286,33 +286,33 @@ const Project: React.FC = () => {
     );
   };
 
-  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string) => {
+  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string, updatedStartDate: Date | null, updatedEndDate: Date | null) => {
     axios.put(
       `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${cardId}`,
-      { title: updatedTitle, description: updatedDescription },
+      { title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate },
       { withCredentials: true }
     );
   
     setBoards(prevBoards => prevBoards.map(board => ({
       ...board,
       cards: board.cards.map(card => 
-        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription } : card
+        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate } : card
       ),
     })));
   };
 
-  const handleCardCreation = async (boardId: number, title: string, description: string) => {
+  const handleCardCreation = async (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null) => {
     setCardCreationModalOpen(false);
     if (!title) return;
   
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
-        { title, description },
+        { title, description, startDate, endDate },
         { withCredentials: true }
       );
 
-      const newCard = { id: response.data.card_id, title, description: description || "" };
+      const newCard = { id: response.data.card_id, title, description: description || "", startDate, endDate };
 
       setBoards((prevBoards) =>
         prevBoards.map((board) =>
