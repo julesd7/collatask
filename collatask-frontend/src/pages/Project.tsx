@@ -399,6 +399,14 @@ const Project: React.FC = () => {
                   >
                     <h3>{card.title}</h3>
                     <p>{card.description}</p>
+                    <div className='timeLeft'>
+                        {card.startDate || card.endDate ? <span className="clock-icon">🕒</span> : null}
+                      {card.startDate && <p className='start-date'>{card.startDate.toLocaleDateString()}</p>}
+                      {card.endDate && <p className='end-date'>{card.endDate.toLocaleDateString()}</p>}
+                    </div>
+                    {card.endDate && card.endDate < new Date() && (
+                      <p className="overdue">Overdue</p>
+                    )}
                   </div>
                 ))
               ) : (

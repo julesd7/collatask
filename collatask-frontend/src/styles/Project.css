@@ -169,3 +169,32 @@
   display: block;
   margin: 10px auto;
 }
+
+/* Time Left Styling */
+.project-container .timeLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.project-container span.clock-icon {
+  font-size: 18px;
+}
+
+.project-container p.start-date {
+  color: green;
+  font-weight: bold;
+}
+
+.project-container p.end-date {
+  color: #cd4400;
+  font-weight: bold;
+}
+
+.project-container p.overdue {
+  background-color: red;
+  font-weight: bold;
+  color: white;
+}
