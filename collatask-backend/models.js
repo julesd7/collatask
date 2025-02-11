@@ -1,4 +1,4 @@
-const { pgTable, uuid, varchar, text, timestamp, integer, boolean } = require('drizzle-orm/pg-core');
+const { pgTable, uuid, varchar, text, timestamp, integer, date, boolean } = require('drizzle-orm/pg-core');
 
 // Projects Table
 const projects = pgTable('projects', {
@@ -36,8 +36,8 @@ const cards = pgTable('cards', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: varchar('title', { length: 100 }).notNull(),
   description: text('description'),
-  start_date: timestamp('start_date'),
-  end_date: timestamp('end_date'),
+  start_date: date('start_date'),
+  end_date: date('end_date'),
   last_change: timestamp('last_change').defaultNow(),
   board_id: uuid('board_id').references(() => boards.id),
   project_id: uuid('project_id').references(() => projects.id),
