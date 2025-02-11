@@ -373,6 +373,9 @@ const Project: React.FC = () => {
         <h1 className="project-title">{projectName}</h1>
         {id && <button onClick={() => handleProjectSettingsClick()} className="header-button settings-button">Settings ⚙️</button>}
       </div>
+      <div className="add-board-container">
+          <button className="add-board-button" onClick={() => setBoardCreationModalOpen(true)}>+ Add a Board</button>
+        </div>
       <div className="boards-container">
         {boards.map((board) => (
           <div
@@ -418,9 +421,6 @@ const Project: React.FC = () => {
             </div>
           </div>
         ))}
-        <div className="add-board-container" onClick={() => setBoardCreationModalOpen(true)}>
-          <button className="add-board-button">+ Add a Board</button>
-        </div>
       </div>
       {ProjectModalOpen && selectedProject && (
         <ProjectModal
