@@ -4,11 +4,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const router = express.Router();
+const { OAuth2Client } = require('google-auth-library');
 
 // drizzle
 const { eq, or, and } = require('drizzle-orm');
 const { users } = require('../models');
 const { db } = require('../db');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Function to generate a refresh token
 const generateRefreshToken = (userId, rememberMe) => {
@@ -148,6 +151,78 @@ router.post('/login', async (req, res) => {
         });
     } catch (error) {
         console.error('Error logging in user', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route for Google login
+router.post('/google', async (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return res.status(400).json({ error: 'Google token is required' });
+    }
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const email = payload.email;
+        const username = payload.name;
+
+        const existingUser = await db.select().from(users).where(eq(users.email, email));
+
+        let finalUsername = username.toLowerCase();
+        let existingUsername = await db.select().from(users).where(eq(users.username, finalUsername));
+
+        while (existingUsername.length > 0 && existingUser.length === 0) {
+            finalUsername = `${username.toLowerCase()}${Math.floor(Math.random() * 1000)}`;
+            existingUsername = await db.select().from(users).where(eq(users.username, finalUsername));
+        }
+
+        let user;
+
+        if (existingUser.length > 0) {
+            user = existingUser[0];
+        } else {
+            user = await db.insert(users).values({
+                username: finalUsername.toLowerCase(),
+                email: email,
+                password: null,
+                verified: true,
+            }).returning({ id: users.id });
+
+            user = user[0];
+        }
+
+        const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const refreshToken = generateRefreshToken(user.id, true);
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'HTTPS',
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'HTTPS',
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
+
+        res.status(200).json({
+            message: 'Logged in successfully via Google',
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+            },
+        });
+    } catch (error) {
+        console.error('Error logging in with Google:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
