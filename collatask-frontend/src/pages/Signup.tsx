@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Auth.css';
+import { GoogleLogin } from '@react-oauth/google';
 
 import Logo from '../assets/logo_white_500x500.png';
 
@@ -16,6 +17,25 @@ const Signup: React.FC = () => {
     const [success, setSuccess] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const handleGoogleLogin = async (response: any) => {
+        const googleToken = response.credential;
+
+        try {
+            const { data } = await axios.post(
+                `${import.meta.env.VITE_APP_URL}/api/auth/google`,
+                { token: googleToken },
+                { withCredentials: true }
+            );
+
+            if (data && data.user) {
+                navigate('/');
+                window.location.reload();
+            }
+        } catch (error) {
+            setError('Google login failed');
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -74,6 +94,16 @@ const Signup: React.FC = () => {
             </div>
             <div className='signup-content'>
                 <h1>Sign Up</h1>
+                <div className="google-login-container">
+                    <GoogleLogin
+                        text="signup_with"
+                        onSuccess={handleGoogleLogin}
+                        onError={() => console.log('Google Login Failed')}
+                        theme="outline"
+                        useOneTap={true}
+                    />
+                </div>
+                <hr />
                 <form onSubmit={handleSubmit}>
                     <input
                         type='text'
