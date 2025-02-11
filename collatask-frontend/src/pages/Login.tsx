@@ -1,9 +1,9 @@
 // Login.tsx
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Auth.css';
+import { GoogleLogin } from '@react-oauth/google';
 
 import Logo from '../assets/logo_white_500x500.png';
 
@@ -94,6 +94,25 @@ const Login: React.FC = () => {
         verifyEmail();
     }, [token]);
 
+    const handleGoogleLogin = async (response: any) => {
+        const googleToken = response.credential;
+
+        try {
+            const { data } = await axios.post(
+                `${import.meta.env.VITE_APP_URL}/api/auth/google`,
+                { token: googleToken },
+                { withCredentials: true }
+            );
+
+            if (data && data.user) {
+                navigate('/');
+                window.location.reload();
+            }
+        } catch (error) {
+            setError('Google login failed');
+        }
+    };
+
     return (
         <div className='signup-container'>
             <div className='logo-wrapper'>
@@ -103,6 +122,16 @@ const Login: React.FC = () => {
             </div>
             <div className='signup-content'>
                 <h1>Sign in</h1>
+                <div className="google-login-container">
+                    <GoogleLogin
+                        text="continue_with"
+                        onSuccess={handleGoogleLogin}
+                        onError={() => console.log('Google Login Failed')}
+                        theme="outline"
+                        useOneTap={true}
+                    />
+                </div>
+                <hr />
                 <form onSubmit={handleSubmit}>
                     <input
                         type='text'

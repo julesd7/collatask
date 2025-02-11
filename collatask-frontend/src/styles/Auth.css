@@ -110,6 +110,18 @@
     font-size: 14px;
 }
 
+.signup-container .google-login-container {
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.signup-container hr {
+    width: 100%;
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
 .signup-container .remember-me-container label {
     display: flex;
     align-items: center;
