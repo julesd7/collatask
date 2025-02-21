@@ -67,4 +67,12 @@ const tasks = pgTable('tasks', {
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
-module.exports = { projects, users, boards, cards, projectAssignments, tasks };
+// Message Table
+const messages = pgTable("messages", {
+  id: uuid('id').defaultRandom().primaryKey(),
+  sender: text("sender").notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+module.exports = { projects, users, boards, cards, projectAssignments, tasks, messages };
