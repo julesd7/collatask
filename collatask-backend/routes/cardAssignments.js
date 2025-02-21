@@ -88,7 +88,7 @@ router.post('/:project_id/:card_id', authenticateJWT, roleMiddleware(['owner', '
 // Endpoint to unassign a user from a Card
 router.delete('/:project_id/:card_id', authenticateJWT, roleMiddleware(['owner', 'admin']), async (req, res) => {
     const { project_id, card_id } = req.params;
-    const user_email = req.body;
+    const user_email = req.body.user_email;
 
     if (!card_id || !user_email) {
         return res.status(400).json({ error: 'Missing information.' });
