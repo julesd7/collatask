@@ -236,7 +236,8 @@ CREATE TABLE public.users (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     verified boolean DEFAULT false,
     verification_token character varying(255),
-    reset_token character varying(255)
+    reset_token character varying(255),
+    last_connection timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 

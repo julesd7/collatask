@@ -151,6 +151,8 @@ router.post('/login', async (req, res) => {
             maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 30 days or 7 days
         });
 
+        await db.update(users).set({ last_connection: new Date() }).where(eq(users.id, user.id));
+
         res.status(200).json({
             message: 'Logged in successfully',
         });

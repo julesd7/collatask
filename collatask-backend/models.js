@@ -20,6 +20,7 @@ const users = pgTable('users', {
   verified: boolean('verified').default(false),
   verification_token: varchar('verification_token', { length: 255 }),
   reset_token: varchar('reset_token', { length: 255 }),
+  last_connection: timestamp('last_connection').defaultNow(),
 });
 
 // Boards Table
