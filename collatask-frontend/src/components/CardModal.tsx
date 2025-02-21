@@ -40,28 +40,34 @@ const CardModal: React.FC<CardModalProps> = ({ card, onSave, onDelete, onClose }
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Card Description"
           />
-          <label>Start Date</label>
-          <input
-            className="input-field"
-            type="date"
-            value={startDate ? startDate.toISOString().split('T')[0] : ''}
-            onChange={(e) => {
-              const newStartDate = e.target.value ? new Date(e.target.value) : null;
-              setStartDate(newStartDate);
-              if (newStartDate && endDate && newStartDate > endDate) {
-                setEndDate(null);
-                (document.querySelector('input[type="date"][min]') as HTMLInputElement).value = '';
-              }
-            }}
-          />
-          <label>Due Date</label>
-          <input
-            className="input-field"
-            type="date"
-            value={endDate ? endDate.toISOString().split('T')[0] : ''}
-            onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : null)}
-            min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
-          />
+          <div className="date-picker">
+            <div className='start-date'>
+              <label>Start Date</label>
+              <input
+                className="input-field"
+                type="date"
+                value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => {
+                  const newStartDate = e.target.value ? new Date(e.target.value) : null;
+                  setStartDate(newStartDate);
+                  if (newStartDate && endDate && newStartDate > endDate) {
+                    setEndDate(null);
+                    (document.querySelector('input[type="date"][min]') as HTMLInputElement).value = '';
+                  }
+                }}
+              />
+            </div>
+            <div className='due-date'>
+              <label>Due Date</label>
+              <input
+                className="input-field"
+                type="date"
+                value={endDate ? endDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : null)}
+                min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+              />
+            </div>
+          </div>
         </div>
         <div className="modal-footer">
           <button className="cancel-btn" onClick={onClose}>Cancel</button>
