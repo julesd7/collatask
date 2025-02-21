@@ -4,6 +4,7 @@ interface CardI {
   description: string;
   startDate: Date | null;
   endDate: Date | null;
+  projectTeamMembers: TeamMember[];
 }
 
 interface BoardI {
@@ -70,7 +71,7 @@ interface CardModalProps {
 }
 
 interface CardCreationModalProps {
-  boardId: number;
+  card: { BoardId: number; teamMembers: TeamMember[] };
   onSave: (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null) => void;
   onClose: () => void;
 }

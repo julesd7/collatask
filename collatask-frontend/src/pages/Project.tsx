@@ -454,7 +454,7 @@ const Project: React.FC = () => {
       )}
       {CardCreationModalOpen && (
         <CardCreationModal
-          boardId={getBoardId}
+          card={{ BoardId: getBoardId, teamMembers }}
           onClose={() => setCardCreationModalOpen(false)}
           onSave={handleCardCreation}
         />
