@@ -25,7 +25,7 @@ const CardCreationModal: React.FC<CardCreationModalProps> = ({ card, onSave, onC
   };
 
   const handleSave = () => {
-    onSave(card.BoardId, title, description, startDate, endDate);
+    onSave(card.BoardId, title, description, startDate, endDate, selectedMembers);
     onClose();
   };
 

@@ -308,14 +308,14 @@ const Project: React.FC = () => {
     })));
   };
 
-  const handleCardCreation = async (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null) => {
+  const handleCardCreation = async (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, selectedMembers: string[] | null) => {
     setCardCreationModalOpen(false);
     if (!title) return;
   
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
-        { title, description, startDate, endDate },
+        { title, description, startDate, endDate, assignedMembers: selectedMembers },
         { withCredentials: true }
       );
 

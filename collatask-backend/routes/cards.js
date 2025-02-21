@@ -6,7 +6,7 @@ const router = express.Router();
 
 // drizzle
 const { eq, and, sql } = require('drizzle-orm');
-const { cards, projects, boards, projectAssignments } = require('../models');
+const { cards, projects, boards, projectAssignments, users } = require('../models');
 const { db } = require('../db');
 
 // Endpoint to get all cards
@@ -45,7 +45,7 @@ router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
 // Endpoint to create a new card
 router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
     const { project_id, board_id } = req.params;
-    const { title, description, startDate, endDate } = req.body;
+    const { title, description, startDate, endDate, assignedMembers } = req.body;
     const user_id = req.user.id;
 
     if (!project_id || !board_id || !title) {
@@ -70,6 +70,23 @@ router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewe
         return res.status(404).json({ error: 'Project or board not found.' });
     }
 
+    const assignedIds = [];
+
+    if (assignedMembers && assignedMembers.length > 0) {
+        for (const member of assignedMembers) {
+            try {
+                const emailChecker = await db.select().from(users).where(eq(users.email, member));
+                if (emailChecker.length === 0) {
+                    console.error(`User ${member} not found`);
+                    continue;
+                }
+                assignedIds.push(emailChecker[0].id);
+            } catch (error) {
+                console.error(`Error notifying member ${member}`, error);
+            }
+        }
+    }
+
     try {
         const result = await db.insert(cards).values({
             project_id: project_id,
@@ -77,7 +94,8 @@ router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewe
             title: title,
             description: description,
             start_date: startDate ? new Date(startDate) : null,
-            end_date: endDate ? new Date(endDate) : null
+            end_date: endDate ? new Date(endDate) : null,
+            assignees_ids: assignedIds.length > 0 ? assignedIds : null
             }
         ).returning({ id: cards.id });    
 
