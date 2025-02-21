@@ -40,8 +40,15 @@
     font-weight: bold;
 }
 
-.home-button {
+.profile-card .profile-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
     margin-top: 20px;
+}
+
+.profile-card .home-button,
+.profile-card .update-button {
     padding: 12px 25px;
     font-size: 1.1rem;
     background-color: var(--button-bg-color);
@@ -50,10 +57,13 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.home-button:hover {
+.profile-card .home-button:hover,
+.profile-card .update-button:hover {
     background-color: var(--accent-color);
     color: var(--text-color);
     transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

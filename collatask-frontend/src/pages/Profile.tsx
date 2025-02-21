@@ -6,12 +6,15 @@ import '../styles/Profile.css';
 
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
+import UpdateProfileModal from '../components/UpdateProfileModal';
 
 const Profile: React.FC = () => {
-    const navigate = useNavigate();
-    const [user, setUser] = useState<{ username: string; email: string } | null>(null);
+  const navigate = useNavigate();
+  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
+  const [isUpdateProfileModalOpen, setUpdateProfileModalState] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/user/me`, {
@@ -22,9 +25,44 @@ const Profile: React.FC = () => {
         console.error('Error fetching user profile:', error);
       }
     };
-    
+
     fetchUserProfile();
   }, []);
+
+  const handleSave = async (username: string, email: string, password: string, newPassword: string) => {
+    let newUsername = username;
+    let newEmail = email;
+    if (username === user?.username) {
+      newUsername = '';
+    }
+    if (email === user?.email) {
+      newEmail = '';
+    }
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_APP_URL}/api/user/update`, {
+        username: newUsername,
+        email: newEmail,
+        oldPass: password,
+        newpass: newPassword,
+      }, {
+        withCredentials: true,
+      }
+      );
+      if (response.status === 204) {
+        return;
+      }
+      const data = await axios.get(`${import.meta.env.VITE_APP_URL}/api/user/me`, {
+        withCredentials: true,
+      });
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setLoading(false);
+      setUser(data.data);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
 
   return (
     <div className="profile-container">
@@ -35,13 +73,32 @@ const Profile: React.FC = () => {
           <div className="profile-card">
             <p><strong>Username:</strong> {user.username}</p>
             <p><strong>Email:</strong> {user.email}</p>
-            <p><br /><br /><em>In the next update,<br />it will be possible to change your information.</em></p>
-            <button className="home-button" onClick={() => navigate('/')}>Home</button>
+            <div className="profile-buttons">
+              <button
+              className="update-button"
+              onClick={() => setUpdateProfileModalState(true)}
+              disabled={loading}
+              >
+              {loading ? 'Loading...' : 'Update Profile'}
+              </button>
+            </div>
           </div>
         ) : (
           <p>Loading...</p>
         )}
       </div>
+      {isUpdateProfileModalOpen && user && (
+        <UpdateProfileModal
+          user={user}
+          onSave={(username, email, password, newPassword) => {
+            handleSave(username, email, password, newPassword);
+          }}
+          onDelete={() => {
+            console.log('Delete user');
+          }}
+          onClose={() => setUpdateProfileModalState(false)}
+        />
+      )}
     </div>
   );
 };
