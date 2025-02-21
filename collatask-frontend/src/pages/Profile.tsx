@@ -64,6 +64,21 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      try {
+      const response = await axios.delete(`${import.meta.env.VITE_APP_URL}/api/user/delete`, {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        navigate('/');
+      }
+      } catch (error) {
+      console.error('Error deleting user:', error);
+      }
+    }
+  };
+
   return (
     <div className="profile-container">
       <Navbar />
@@ -94,7 +109,7 @@ const Profile: React.FC = () => {
             handleSave(username, email, password, newPassword);
           }}
           onDelete={() => {
-            console.log('Delete user');
+            handleDelete();
           }}
           onClose={() => setUpdateProfileModalState(false)}
         />
