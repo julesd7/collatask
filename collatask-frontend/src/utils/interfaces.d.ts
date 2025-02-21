@@ -29,6 +29,11 @@ interface TeamMember {
   role: string;
 }
 
+interface User {
+  username: string;
+  email: string;
+}
+
 interface ProjectModalProps {
   project: {
     id: string;
@@ -67,6 +72,13 @@ interface CardModalProps {
 interface CardCreationModalProps {
   boardId: number;
   onSave: (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null) => void;
+  onClose: () => void;
+}
+
+export interface UpdateProfileModalProps {
+  user: { username: string; email: string; };
+  onSave: (username: string, email: string,  oldPassword: string, newPassword: string) => void;
+  onDelete: () => void;
   onClose: () => void;
 }
 
