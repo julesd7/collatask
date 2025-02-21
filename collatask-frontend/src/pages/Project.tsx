@@ -462,6 +462,7 @@ const Project: React.FC = () => {
       {CardModalOpen && selectedCard && (
         <CardModal
           card={selectedCard}
+          teamMembers={teamMembers}
           onClose={() => setCardModalOpen(false)}
           onDelete={(cardId) => handleCardDeletion(cardId)}
           onSave={handleSaveCard}

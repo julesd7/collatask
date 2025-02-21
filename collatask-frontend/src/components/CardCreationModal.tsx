@@ -7,7 +7,7 @@ const CardCreationModal: React.FC<CardCreationModalProps> = ({ card, onSave, onC
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [assignedMembers, setAssignedMembers] = useState<string[]>([]);
 
   if (card.BoardId === undefined) {
     console.error('boardId is undefined');
@@ -15,7 +15,7 @@ const CardCreationModal: React.FC<CardCreationModalProps> = ({ card, onSave, onC
   }
 
   const handleCheckboxChange = (email: string) => {
-    setSelectedMembers((prevSelected) => {
+    setAssignedMembers((prevSelected) => {
       if (prevSelected.includes(email)) {
         return prevSelected.filter((item) => item !== email);
       } else {
@@ -25,7 +25,7 @@ const CardCreationModal: React.FC<CardCreationModalProps> = ({ card, onSave, onC
   };
 
   const handleSave = () => {
-    onSave(card.BoardId, title, description, startDate, endDate, selectedMembers);
+    onSave(card.BoardId, title, description, startDate, endDate, assignedMembers);
     onClose();
   };
 
@@ -84,7 +84,7 @@ const CardCreationModal: React.FC<CardCreationModalProps> = ({ card, onSave, onC
                     type="checkbox"
                     id={member.email}
                     value={member.email}
-                    checked={selectedMembers.includes(member.email)}
+                    checked={assignedMembers.includes(member.email)}
                     onChange={() => handleCheckboxChange(member.email)}
                   />
                   <label htmlFor={member.email}>{member.email}</label>
