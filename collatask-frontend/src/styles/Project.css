@@ -183,6 +183,30 @@
   margin: 10px auto;
 }
 
+.project-container .assigned-members {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.project-container .assigned-member {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--card-background-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.project-container .profile-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 /* Time Left Styling */
 .project-container .timeLeft {
   display: flex;

@@ -10,6 +10,8 @@ import CardCreationModal from '../components/CardCreationModal';
 
 import { ProjectI, BoardI, CardI } from '../utils/interfaces';
 
+import profilePicture from '../assets/profile_icon_default.png';
+
 import '../styles/Project.css';
 
 const Project: React.FC = () => {
@@ -65,6 +67,7 @@ const Project: React.FC = () => {
               ...card,
               startDate: card.start_date ? new Date(card.start_date) : null,
               endDate: card.end_date ? new Date(card.end_date) : null,
+              assignedMembers: card.assignees_ids || []
             };
           return newCard;
               });
@@ -410,6 +413,18 @@ const Project: React.FC = () => {
                     {card.endDate && card.endDate < new Date() && (
                       <p className="overdue">Overdue</p>
                     )}
+                    <div>
+                      {card.assignedMembers && card.assignedMembers.length > 0 && (
+                        <div className="assigned-members">
+                            {card.assignedMembers.map((member: number) => (
+                                <div key={card.id + member} className="assigned-member">
+                                <img src={profilePicture} alt="Profile" className="profile-icon" />
+                                <p key={member}>{member}</p>
+                                </div>
+                            ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (
