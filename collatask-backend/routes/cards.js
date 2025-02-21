@@ -35,7 +35,21 @@ router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
         if (cardsResult.length === 0) {
             return res.status(204).send();
         }
-        res.status(200).json(cardsResult);
+        const assigneesEmails = await Promise.all(cardsResult.map(async (card) => {
+            if (card.assignees_ids && card.assignees_ids.length > 0) {
+            const emails = [];
+            for (const assigneeId of card.assignees_ids) {
+                const email = await db.select({ email: users.email }).from(users).where(eq(users.id, assigneeId));
+                if (email.length > 0) {
+                    emails.push(email[0].email);
+                }
+            }
+            return { ...card, assignees_emails: emails };
+            }
+            return { ...card, assignees_emails: [] };
+        }));
+
+        res.status(200).json({ cards: assigneesEmails });
     } catch (error) {
         console.error('Error fetching cards', error);
         res.status(500).json({ error: 'Internal server error' });

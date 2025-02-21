@@ -62,12 +62,12 @@ const Project: React.FC = () => {
           `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${board.id}`,
           { withCredentials: true }
               );
-              const cardsWithDates = cardsResponse.data.map((card: any) => {
+              const cardsWithDates = cardsResponse.data.cards.map((card: any) => {
             const newCard = {
               ...card,
               startDate: card.start_date ? new Date(card.start_date) : null,
               endDate: card.end_date ? new Date(card.end_date) : null,
-              assignedMembers: card.assignees_ids || []
+              assignedMembers: card.assignees_emails || []
             };
           return newCard;
               });
@@ -416,7 +416,7 @@ const Project: React.FC = () => {
                     <div>
                       {card.assignedMembers && card.assignedMembers.length > 0 && (
                         <div className="assigned-members">
-                            {card.assignedMembers.map((member: number) => (
+                            {card.assignedMembers.map((member: string) => (
                                 <div key={card.id + member} className="assigned-member">
                                 <img src={profilePicture} alt="Profile" className="profile-icon" />
                                 <p key={member}>{member}</p>

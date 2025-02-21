@@ -197,7 +197,11 @@
   gap: 5px;
   background-color: var(--card-background-color);
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.project-container .assigned-member p {
+  font-size: 14px;
+  color: #a5a5a5;
 }
 
 .project-container .profile-icon {
