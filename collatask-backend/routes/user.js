@@ -42,14 +42,17 @@ router.put('/update', authenticateJWT, async (req, res) => {
             }
             hashedPassword = await bcrypt.hash(newPass, 10);
         }
-        await db.update(users).set({
-            username: username,
-            email: email,
-            password: hashedPassword,
-        }).where(eq(users.id, userId));
+        const updateData = {};
+        if (username) updateData.username = username;
+        if (email) updateData.email = email;
+        if (oldPass && newPass) updateData.password = hashedPassword;
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(204).json({ error: 'No information provided to update.' });
+        }
+        await db.update(users).set(updateData).where(eq(users.id, userId));
         return res.status(200).json({ message: 'User information updated successfully.' });
 
-        res.status(204).send();
     } catch (error) {
         console.error('Error updating user information', error);
         res.status(500).json({ error: 'Internal server error.' });
