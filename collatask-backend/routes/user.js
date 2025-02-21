@@ -23,7 +23,7 @@ router.get('/me', authenticateJWT, (req, res) => {
 
 // Endpoint to update user information
 router.put('/update', authenticateJWT, async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, oldPass, newPass } = req.body;
     const userId = req.user.id;
     let hashedPassword = req.user.password;
 
@@ -35,8 +35,12 @@ router.put('/update', authenticateJWT, async (req, res) => {
             }
         }
 
-        if (password) {
-            hashedPassword = await bcrypt.hash(password, 10);
+        if (oldPass && newPass) {
+            const validPassword = await bcrypt.compare(oldPass, hashedPassword);
+            if (!validPassword) {
+                return res.status(401).json({ error: 'Invalid password' });
+            }
+            hashedPassword = await bcrypt.hash(newPass, 10);
         }
         await db.update(users).set({
             username: username,
