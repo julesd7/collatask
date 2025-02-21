@@ -10,6 +10,8 @@ import CardCreationModal from '../components/CardCreationModal';
 
 import { ProjectI, BoardI, CardI } from '../utils/interfaces';
 
+import profilePicture from '../assets/profile_icon_default.png';
+
 import '../styles/Project.css';
 
 const Project: React.FC = () => {
@@ -60,11 +62,12 @@ const Project: React.FC = () => {
           `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${board.id}`,
           { withCredentials: true }
               );
-              const cardsWithDates = cardsResponse.data.map((card: any) => {
+              const cardsWithDates = cardsResponse.data.cards.map((card: any) => {
             const newCard = {
               ...card,
               startDate: card.start_date ? new Date(card.start_date) : null,
               endDate: card.end_date ? new Date(card.end_date) : null,
+              assignedMembers: card.assignees_emails || []
             };
           return newCard;
               });
@@ -293,33 +296,52 @@ const Project: React.FC = () => {
     );
   };
 
-  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string, updatedStartDate: Date | null, updatedEndDate: Date | null) => {
+  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string, updatedStartDate: Date | null, updatedEndDate: Date | null, oldAssignedMembers: string[] | null, newAssignedMembers: string[] | null) => {
     axios.put(
       `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${cardId}`,
       { title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate },
       { withCredentials: true }
     );
+    const newAssignees = newAssignedMembers?.filter(
+      (newMember) => !oldAssignedMembers?.includes(newMember)
+    ) || [];
+    newAssignees.forEach(async (newAssignee) => {
+      await axios.post(
+        `${import.meta.env.VITE_APP_URL}/api/card-assignments/${id}/${cardId}`,
+        { user_email: newAssignee },
+        { withCredentials: true }
+      );
+    });
+    const removedAssignees = oldAssignedMembers?.filter(
+      (oldMember) => !newAssignedMembers?.includes(oldMember)
+    ) || [];
+    removedAssignees.forEach(async (removedAssignee) => {
+      await axios.delete(
+        `${import.meta.env.VITE_APP_URL}/api/card-assignments/${id}/${cardId}`,
+        { data: { user_email: removedAssignee }, withCredentials: true }
+      );
+    });
   
     setBoards(prevBoards => prevBoards.map(board => ({
       ...board,
       cards: board.cards.map(card => 
-        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate } : card
+        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate, assignedMembers: newAssignedMembers } : card
       ),
     })));
   };
 
-  const handleCardCreation = async (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null) => {
+  const handleCardCreation = async (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, selectedMembers: string[] | null) => {
     setCardCreationModalOpen(false);
     if (!title) return;
   
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
-        { title, description, startDate, endDate },
+        { title, description, startDate, endDate, assignedMembers: selectedMembers },
         { withCredentials: true }
       );
 
-      const newCard = { id: response.data.card_id, title, description: description || "", startDate, endDate };
+      const newCard = { id: response.data.card_id, title, description: description || "", startDate, endDate, assignedMembers: selectedMembers };
 
       setBoards((prevBoards) =>
         prevBoards.map((board) =>
@@ -410,6 +432,18 @@ const Project: React.FC = () => {
                     {card.endDate && card.endDate < new Date() && (
                       <p className="overdue">Overdue</p>
                     )}
+                    <div>
+                      {card.assignedMembers && card.assignedMembers.length > 0 && (
+                        <div className="assigned-members">
+                            {card.assignedMembers.map((member: string) => (
+                                <div key={card.id + member} className="assigned-member">
+                                <img src={profilePicture} alt="Profile" className="profile-icon" />
+                                <p key={member}>{member}</p>
+                                </div>
+                            ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (
@@ -447,6 +481,7 @@ const Project: React.FC = () => {
       {CardModalOpen && selectedCard && (
         <CardModal
           card={selectedCard}
+          teamMembers={teamMembers}
           onClose={() => setCardModalOpen(false)}
           onDelete={(cardId) => handleCardDeletion(cardId)}
           onSave={handleSaveCard}
@@ -454,7 +489,7 @@ const Project: React.FC = () => {
       )}
       {CardCreationModalOpen && (
         <CardCreationModal
-          boardId={getBoardId}
+          card={{ BoardId: getBoardId, teamMembers }}
           onClose={() => setCardCreationModalOpen(false)}
           onSave={handleCardCreation}
         />

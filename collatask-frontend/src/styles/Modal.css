@@ -148,6 +148,39 @@
   margin-right: 10px;
 }
 
+/* Assign Users Section */
+.modal-overlay .assign-users {
+  margin-top: 15px;
+}
+
+.modal-overlay .assign-users h3 {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: bold;
+  display: block;
+}
+
+.modal-overlay .team-members-checkboxes {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-overlay .team-member-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-overlay .team-member-checkbox input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.modal-overlay .team-member-checkbox label {
+  font-size: 1rem;
+  color: #333;
+}
+
 /* Modal Footer */
 .modal-overlay .modal-footer {
   display: flex;

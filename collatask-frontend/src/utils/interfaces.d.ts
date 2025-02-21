@@ -4,6 +4,7 @@ interface CardI {
   description: string;
   startDate: Date | null;
   endDate: Date | null;
+  assignedMembers: string[];
 }
 
 interface BoardI {
@@ -63,15 +64,16 @@ interface BoardCreationModalProps {
 }
 
 interface CardModalProps {
-  card: { id: number; title: string; description: string; startDate: Date | null; endDate: Date | null };
-  onSave: (cardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null) => void;
+  card: { id: number; title: string; description: string; startDate: Date | null; endDate: Date | null; assignedMembers: string[]; };
+  teamMembers: { email: string; role: string }[];
+  onSave: (cardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, oldAssignedMembers: string[] | null, newAssignedMembers: string[] | null ) => void;
   onDelete: (cardId: number) => void;
   onClose: () => void;
 }
 
 interface CardCreationModalProps {
-  boardId: number;
-  onSave: (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null) => void;
+  card: { BoardId: number; teamMembers: TeamMember[] };
+  onSave: (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, assignedMembers: string[] | null ) => void;
   onClose: () => void;
 }
 

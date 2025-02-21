@@ -4,15 +4,26 @@ import { CardModalProps } from '../utils/interfaces';
 
 import '../styles/Modal.css';
 
-const CardModal: React.FC<CardModalProps> = ({ card, onSave, onDelete, onClose }) => {
+const CardModal: React.FC<CardModalProps> = ({ card, teamMembers, onSave, onDelete, onClose }) => {
   const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description);
   const [startDate, setStartDate] = useState<Date | null>(card.startDate ? new Date(card.startDate) : null);
   const [endDate, setEndDate] = useState<Date | null>(card.endDate ? new Date(card.endDate) : null);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>(card.assignedMembers || []);
 
   const handleSave = () => {
-    onSave(card.id, title, description, startDate, endDate);
+    onSave(card.id, title, description, startDate, endDate, card.assignedMembers, selectedMembers);
     onClose();
+  };
+
+  const handleCheckboxChange = (email: string) => {
+    setSelectedMembers((prevSelected) => {
+      if (prevSelected.includes(email)) {
+        return prevSelected.filter((item) => item !== email);
+      } else {
+        return [...prevSelected, email];
+      }
+    });
   };
 
   const handleDelete = () => {
@@ -66,6 +77,23 @@ const CardModal: React.FC<CardModalProps> = ({ card, onSave, onDelete, onClose }
                 onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : null)}
                 min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
               />
+            </div>
+          </div>
+          <div className="assign-users">
+            <h3>Assigned to:</h3>
+            <div className="team-members-checkboxes">
+                {teamMembers?.filter(member => member.role !== 'viewer').map((member) => (
+                <div key={member.email} className="team-member-checkbox">
+                  <input
+                    type="checkbox"
+                    id={member.email}
+                    value={member.email}
+                    checked={selectedMembers.includes(member.email)}
+                    onChange={() => handleCheckboxChange(member.email)}
+                  />
+                  <label htmlFor={member.email}>{member.email}</label>
+                </div>
+              ))}
             </div>
           </div>
         </div>
