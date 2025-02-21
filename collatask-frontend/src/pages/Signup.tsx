@@ -100,7 +100,6 @@ const Signup: React.FC = () => {
                         onSuccess={handleGoogleLogin}
                         onError={() => console.log('Google Login Failed')}
                         theme="outline"
-                        useOneTap={true}
                     />
                 </div>
                 <hr />

@@ -220,6 +220,8 @@ router.post('/google', async (req, res) => {
             maxAge: 30 * 24 * 60 * 60 * 1000,
         });
 
+        db.update(users).set({ last_connection: new Date() }).where(eq(users.id, user.id));
+
         res.status(200).json({
             message: 'Logged in successfully via Google',
             user: {
