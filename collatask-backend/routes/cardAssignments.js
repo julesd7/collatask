@@ -40,9 +40,9 @@ router.get('/:card_id', authenticateJWT, async (req, res) => {
 // Endpoint to assign a user to a card
 router.post('/:project_id/:card_id', authenticateJWT, roleMiddleware(['owner', 'admin']), async (req, res) => {
     const { project_id, card_id } = req.params;
-    const { user_id } = req.body;
+    const { user_email } = req.body;
 
-    if (!card_id || !user_id) {
+    if (!card_id || !user_email) {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
@@ -58,11 +58,13 @@ router.post('/:project_id/:card_id', authenticateJWT, roleMiddleware(['owner', '
         return res.status(404).json({ error: 'Project or card not found.' });
     }
 
-    const userCheck = await db.select().from(users).where(eq(users.id, user_id));
+    const userCheck = await db.select().from(users).where(eq(users.email, user_email));
 
     if (userCheck.length === 0) {
         return res.status(404).json({ error: 'User not found.' });
     }
+
+    const user_id = userCheck[0].id;
 
     const existingAssignment = await db.select({ assignees_ids: cards.assignees_ids }).from(cards).where(eq(cards.id, card_id));
 
@@ -86,9 +88,9 @@ router.post('/:project_id/:card_id', authenticateJWT, roleMiddleware(['owner', '
 // Endpoint to unassign a user from a Card
 router.delete('/:project_id/:card_id', authenticateJWT, roleMiddleware(['owner', 'admin']), async (req, res) => {
     const { project_id, card_id } = req.params;
-    const user_id = req.body.user_id;
+    const user_email = req.body;
 
-    if (!card_id || !user_id) {
+    if (!card_id || !user_email) {
         return res.status(400).json({ error: 'Missing information.' });
     }
 
@@ -104,11 +106,13 @@ router.delete('/:project_id/:card_id', authenticateJWT, roleMiddleware(['owner',
         return res.status(404).json({ error: 'Project or card not found.' });
     }
 
-    const userCheck = await db.select().from(users).where(eq(users.id, user_id));
+    const userCheck = await db.select().from(users).where(eq(users.email, user_email));
 
     if (userCheck.length === 0) {
         return res.status(404).json({ error: 'User not found.' });
     }
+
+    const user_id = userCheck[0].id;
 
     try {
         await db.update(cards).set({ assignees_ids: sql` array_remove(assignees_ids, ${user_id})` }).where(eq(cards.id, card_id));
