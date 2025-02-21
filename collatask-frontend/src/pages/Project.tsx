@@ -296,17 +296,36 @@ const Project: React.FC = () => {
     );
   };
 
-  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string, updatedStartDate: Date | null, updatedEndDate: Date | null) => {
+  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string, updatedStartDate: Date | null, updatedEndDate: Date | null, oldAssignedMembers: string[] | null, newAssignedMembers: string[] | null) => {
     axios.put(
       `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${cardId}`,
       { title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate },
       { withCredentials: true }
     );
+    const newAssignees = newAssignedMembers?.filter(
+      (newMember) => !oldAssignedMembers?.includes(newMember)
+    ) || [];
+    newAssignees.forEach(async (newAssignee) => {
+      await axios.post(
+        `${import.meta.env.VITE_APP_URL}/api/card-assignments/${id}/${cardId}`,
+        { user_email: newAssignee },
+        { withCredentials: true }
+      );
+    });
+    const removedAssignees = oldAssignedMembers?.filter(
+      (oldMember) => !newAssignedMembers?.includes(oldMember)
+    ) || [];
+    removedAssignees.forEach(async (removedAssignee) => {
+      await axios.delete(
+        `${import.meta.env.VITE_APP_URL}/api/card-assignments/${id}/${cardId}`,
+        { data: { user_email: removedAssignee }, withCredentials: true }
+      );
+    });
   
     setBoards(prevBoards => prevBoards.map(board => ({
       ...board,
       cards: board.cards.map(card => 
-        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate } : card
+        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate, assignedMembers: newAssignedMembers } : card
       ),
     })));
   };
@@ -322,7 +341,7 @@ const Project: React.FC = () => {
         { withCredentials: true }
       );
 
-      const newCard = { id: response.data.card_id, title, description: description || "", startDate, endDate };
+      const newCard = { id: response.data.card_id, title, description: description || "", startDate, endDate, assignedMembers: selectedMembers };
 
       setBoards((prevBoards) =>
         prevBoards.map((board) =>

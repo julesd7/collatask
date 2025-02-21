@@ -12,7 +12,7 @@ const CardModal: React.FC<CardModalProps> = ({ card, teamMembers, onSave, onDele
   const [selectedMembers, setSelectedMembers] = useState<string[]>(card.assignedMembers || []);
 
   const handleSave = () => {
-    onSave(card.id, title, description, startDate, endDate, selectedMembers);
+    onSave(card.id, title, description, startDate, endDate, card.assignedMembers, selectedMembers);
     onClose();
   };
 
