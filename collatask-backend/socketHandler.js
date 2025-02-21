@@ -3,7 +3,6 @@ const { messages } = require('./models');
 
 module.exports = function(io) {
     io.on("connection", (socket) => {
-        console.log("A user connected: " + socket.id);
         socket.on("sendMessage", async (data) => {
             const { sender, message } = data;
 
