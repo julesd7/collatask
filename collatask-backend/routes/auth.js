@@ -55,8 +55,8 @@ router.post('/register', async (req, res) => {
         }).returning({id: users.id});
 
         const transporter = nodemailer.createTransport({
-            host: 'smtp.zoho.eu',
-            port: 587,
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
             secure: false, // STARTTLS → `secure: false`
             auth: {
                 user: process.env.EMAIL_USER,
@@ -297,8 +297,8 @@ router.post('/reset', async (req, res) => {
         await db.update(users).set({ reset_token: resetToken }).where(eq(users.id, user.id));
 
         const transporter = nodemailer.createTransport({
-            host: 'smtp.zoho.eu',
-            port: 587,
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
             secure: false, // STARTTLS → `secure: false`
             auth: {
                 user: process.env.EMAIL_USER,
