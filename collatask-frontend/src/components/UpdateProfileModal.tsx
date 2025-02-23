@@ -40,7 +40,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({ user, onSave, o
                         className="input-field"
                         type="text"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) => setUsername(e.target.value.toLowerCase())}
                         placeholder="Username"
                     />
                     <input
