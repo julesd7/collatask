@@ -92,7 +92,8 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
             sendMessage();
         }
     };
@@ -110,7 +111,7 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
                             messages.map((msg, index) => (
                                 <div
                                     key={index}
-                                    className={`chat-message ${msg.sent ? "sent" : "unsent"} ${msg.sender !== username ? "received" : ""}`}
+                                    className={`chat-message ${msg.sender !== username ? "received" : msg.sent ? "sent" : "unsent"}`}
                                 >
                                     <span className="chat-sender">{msg.sender}:</span> {msg.message}
                                 </div>
@@ -118,8 +119,7 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
                         )}
                         <div ref={messagesEndRef} />
                     </div>
-                    <input
-                        type="text"
+                    <textarea
                         className="chat-input"
                         placeholder="Type a message..."
                         value={message}
