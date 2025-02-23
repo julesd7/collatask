@@ -40,6 +40,12 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
         checkRoom();
         socket.emit("joinRoom", chat.room);
 
+        const unsentMessages = JSON.parse(localStorage.getItem("unsentMessages") || "[]");
+        setMessages((prevMessages) => [
+            ...prevMessages,
+            ...unsentMessages.map((msg: { sender: string, message: string }) => ({ ...msg, sent: false })),
+        ]);
+
         socket.on("historicalMessages", (historicalMessages) => {
             setMessages(historicalMessages.map((msg: { sender: string, message: string }) => ({ ...msg, sent: true })));
         });
@@ -63,6 +69,10 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
                     msg.message === message.message ? { ...msg, sent: true } : msg
                 )
             );
+
+            const unsentMessages = JSON.parse(localStorage.getItem("unsentMessages") || "[]");
+            const updatedUnsentMessages = unsentMessages.filter((msg: { message: string }) => msg.message !== message.message);
+            localStorage.setItem("unsentMessages", JSON.stringify(updatedUnsentMessages));
         });
 
         return () => {
@@ -84,6 +94,11 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
             if (recentMessages.length < 10) {
                 const newMessage = { sender: username, message, sent: false };
                 setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+                const unsentMessages = JSON.parse(localStorage.getItem("unsentMessages") || "[]");
+                unsentMessages.push(newMessage);
+                localStorage.setItem("unsentMessages", JSON.stringify(unsentMessages));
+
                 socket.emit("sendMessage", { sender: username, message, room: chat.room });
                 setMessage("");
                 setMessageHistory([...recentMessages, { time: currentTime }]);
