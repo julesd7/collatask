@@ -1,6 +1,7 @@
 // projectAssignments.js
 const express = require('express');
 const { authenticateJWT } = require('../middleware/authMiddleware');
+const nodemailer = require('nodemailer');
 const router = express.Router();
 
 // drizzle
@@ -79,6 +80,35 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
             role: userRole,
         }).returning();
         await db.update(projects).set({updated_at: sql`NOW()`}).where(eq(projects.id, project_id));
+
+        const transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+            connectionTimeout: 15000,
+            tls: {
+                rejectUnauthorized: false,
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'You have been assigned to a project',
+            text: `You have been assigned to a project. Please login to your account to view the project details.\n\nProject link: ${process.env.FRONTEND_URL}/projects/${project_id}\nRole: ${userRole}\n\n`,
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.error('Error sending verification email', err);
+                return res.status(500).json({ error: 'Error sending email' });
+            }
+        });
+
         res.status(201).json({ message: 'Project assigned successfully', assignment: result[0] });
     } catch (error) {
         console.error('Error assigning project', error);
