@@ -394,7 +394,7 @@ const Project: React.FC = () => {
         <button onClick={() => navigate('/')} className="header-button back-button">
           <span className="arrow">←</span> Home
         </button>
-        <h1 className="project-title" onClick={()=> setChatModalOpen(true)}>{projectName}</h1>
+        <h1 className="project-title" onClick={()=> setChatModalOpen(true)}>{projectName}<br/><span>click here to open team chat</span></h1>
         {id && <button onClick={() => handleProjectSettingsClick()} className="header-button settings-button">Settings ⚙️</button>}
       </div>
       <div className="add-board-container">
