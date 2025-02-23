@@ -70,7 +70,7 @@ router.put('/update', authenticateJWT, async (req, res) => {
             });
 
             const mailOptions = {
-                from: process.env.EMAIL_USER,
+                from: process.env.EMAIL_FROM,
                 to: email,
                 subject: 'Please verify your email address',
                 text: `Click on the link to verify your email: ${process.env.FRONTEND_URL}/login?token=${verificationToken}`,

@@ -37,7 +37,7 @@ router.post('/', authenticateJWT, async (req, res) => {
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: process.env.EMAIL_FROM,
         to: process.env.CONTACT_EMAIL,
         subject: `Message from ${name} | Contact`,
         text: emailContent,

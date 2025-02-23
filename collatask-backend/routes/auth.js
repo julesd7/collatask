@@ -69,7 +69,7 @@ router.post('/register', async (req, res) => {
         });
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: process.env.EMAIL_FROM,
             to: email,
             subject: 'Please verify your email address',
             text: `Click on the link to verify your email: ${process.env.FRONTEND_URL}/login?token=${verificationToken}`,
@@ -311,7 +311,7 @@ router.post('/reset', async (req, res) => {
         });
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: process.env.EMAIL_FROM,
             to: user.email,
             subject: 'Password Reset Request',
             text: `Click on the link to reset your password: ${process.env.FRONTEND_URL}/reset?token=${resetToken}`,

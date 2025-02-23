@@ -96,7 +96,7 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
         });
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: process.env.EMAIL_FROM,
             to: email,
             subject: 'You have been assigned to a project',
             text: `You have been assigned to a project. Please login to your account to view the project details.\n\nProject link: ${process.env.FRONTEND_URL}/projects/${project_id}\nRole: ${userRole}\n\n`,
