@@ -72,6 +72,7 @@ const messages = pgTable("messages", {
   id: uuid('id').defaultRandom().primaryKey(),
   sender: text("sender").notNull(),
   message: text("message").notNull(),
+  room: uuid('room').references(() => projects.id).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
