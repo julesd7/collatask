@@ -15,6 +15,8 @@ module.exports = function(io) {
                 await db.insert(messages).values({ sender, message, room });
 
                 io.to(room).emit("receiveMessage", data);
+
+                socket.emit('messageAck', data);
             } catch (error) {
                 console.error("Error saving message:", error);
             }
