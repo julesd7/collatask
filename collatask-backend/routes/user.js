@@ -81,10 +81,6 @@ router.put('/update', authenticateJWT, async (req, res) => {
                     console.error('Error sending verification email', err);
                     return res.status(500).json({ error: 'Error sending email' });
                 }
-                return res.status(201).json({
-                    message: 'User registered successfully. Please check your email to verify your account.',
-                    user_id: result[0].id,
-                });
             });
         }
 
