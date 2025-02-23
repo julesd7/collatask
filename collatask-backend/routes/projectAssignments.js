@@ -49,6 +49,9 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
         return res.status(404).json({ error: 'Project not found' });
     }
 
+    const getName = await db.select({name: projects.title}).from(projects).where(eq(projects.id, project_id));
+    const projectName = getName[0].name;
+
     try {
         const userCheck = await db.select({id: users.id}).from(users).where(eq(users.email, email));
         if (userCheck.length === 0) {
@@ -99,7 +102,7 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
             from: process.env.EMAIL_FROM,
             to: email,
             subject: 'You have been assigned to a project',
-            text: `You have been assigned to a project. Please login to your account to view the project details.\n\nProject link: ${process.env.FRONTEND_URL}/projects/${project_id}\nRole: ${userRole}\n\n`,
+            text: `You have been assigned to a project. Please login to your account to view the project details.\n\nProject name: ${projectName}\nProject link: ${process.env.FRONTEND_URL}/projects/${project_id}\nRole: ${userRole}\n\n`,
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
