@@ -7,6 +7,7 @@ import BoardModal from '../components/BoardModal';
 import BoardCreationModal from '../components/BoardCreationModal';
 import CardModal from '../components/CardModal';
 import CardCreationModal from '../components/CardCreationModal';
+import ChatModal from '../components/ChatModal';
 
 import { ProjectI, BoardI, CardI } from '../utils/interfaces';
 
@@ -34,6 +35,7 @@ const Project: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<ProjectI | null>(null);
   const [selectedBoard, setSelectedBoard] = useState<BoardI | null>(null);
   const [selectedCard, setSelectedCard] = useState<CardI | null>(null);
+  const [ChatModalOpen, setChatModalOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -392,7 +394,7 @@ const Project: React.FC = () => {
         <button onClick={() => navigate('/')} className="header-button back-button">
           <span className="arrow">←</span> Home
         </button>
-        <h1 className="project-title">{projectName}</h1>
+        <h1 className="project-title" onClick={()=> setChatModalOpen(true)}>{projectName}</h1>
         {id && <button onClick={() => handleProjectSettingsClick()} className="header-button settings-button">Settings ⚙️</button>}
       </div>
       <div className="add-board-container">
@@ -494,6 +496,12 @@ const Project: React.FC = () => {
           onSave={handleCardCreation}
         />
       )}
+      {ChatModalOpen && (
+        <ChatModal
+          chat={{ room: id }}
+          onClose={() => setChatModalOpen(false)}
+        />
+        )}
     </div>
   );
 };
