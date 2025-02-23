@@ -5,7 +5,6 @@ import { io } from "socket.io-client";
 import { ChatModalProps } from "../utils/interfaces";
 
 import "../styles/Chat.css";
-import "../styles/Modal.css";
 
 const socket = io(import.meta.env.VITE_APP_URL);
 
@@ -41,6 +40,9 @@ const Chat: React.FC<ChatModalProps> = ({chat, onClose}) => {
 
     useEffect(() => {
         socket.on("receiveMessage", (data) => {
+            if (data.sender === username) {
+                return;
+            }
             setMessages((prevMessages) => [...prevMessages, data]);
         });
 
@@ -72,27 +74,49 @@ const Chat: React.FC<ChatModalProps> = ({chat, onClose}) => {
     };
 
     return (
-        <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-btn" onClick={onClose}>×</button>
-        <div className="modal-header">Chat with team</div>
-        <div className="modal-body">
-        <input
-            type="text"
-            className="chat-input"
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
+        <div className="chat-overlay">
+        <div className="chat-content">
+          <button className="close-btn" onClick={onClose}>×</button>
+          <div className="chat-header">Chat with Team</div>
+          <div className="chat-body">
+            <div className="chat-messages">
+              {messages.length === 0 ? (
+                <div className="no-messages">No messages</div>
+              ) : (
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`chat-message ${msg.sender === username ? "sent" : "received"}`}
+                  >
+                    <span className="chat-sender">{msg.sender}:</span> {msg.message}
+                  </div>
+                ))
+              )}
+            </div>
+            <input
+              type="text"
+              className="chat-input"
+              placeholder="Type a message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
             />
-        </div>
-        
-        <div className="modal-footer">
-        <button onClick={sendMessage} className="chat-send-button" disabled={!message.trim()}>Send</button>
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          </div>
+
+          <div className="chat-footer">
+            <button className="cancel-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button
+              onClick={sendMessage}
+              className="chat-send-button"
+              disabled={!message.trim()}
+            >
+              Send
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     );
 };
 
