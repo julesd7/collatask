@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faHourglass } from '@fortawesome/free-solid-svg-icons';
 
 import { ChatModalProps } from "../utils/interfaces";
 
@@ -86,7 +88,7 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
                 setMessage("");
                 setMessageHistory([...recentMessages, { time: currentTime }]);
             } else {
-                alert("WOW! Slow down there, cowboy! You're sending messages too fast.");
+                alert("WOW! Slow down there, cowboy! You're sending messages way too fast.");
             }
         }
     };
@@ -114,6 +116,15 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
                                     className={`chat-message ${msg.sender !== username ? "received" : msg.sent ? "sent" : "unsent"}`}
                                 >
                                     <span className="chat-sender">{msg.sender}:</span> {msg.message}
+                                    {msg.sender === username && ((msg.sent && index === messages.length - 1) || !msg.sent) && (
+                                        <span className="message-status">
+                                            {msg.sent ? (
+                                                <FontAwesomeIcon icon={faCheck} />
+                                            ) : (
+                                                <FontAwesomeIcon icon={faHourglass} />
+                                            )}
+                                        </span>
+                                    )}
                                 </div>
                             ))
                         )}
