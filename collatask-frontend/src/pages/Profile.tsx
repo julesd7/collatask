@@ -52,6 +52,17 @@ const Profile: React.FC = () => {
       if (response.status === 204) {
         return;
       }
+      if (newEmail) {
+        try {
+          await axios.post(`${import.meta.env.VITE_APP_URL}/api/auth/logout`, {}, {
+            withCredentials: true,
+          });
+          navigate('/');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error logging out:', error);
+        }
+      }
       const data = await axios.get(`${import.meta.env.VITE_APP_URL}/api/user/me`, {
         withCredentials: true,
       });

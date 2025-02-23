@@ -2,6 +2,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
+const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 
 // drizzle
 const { eq, or } = require('drizzle-orm');
@@ -44,8 +46,47 @@ router.put('/update', authenticateJWT, async (req, res) => {
         }
         const updateData = {};
         if (username) updateData.username = username;
-        if (email) updateData.email = email;
         if (oldPass && newPass) updateData.password = hashedPassword;
+
+        if (email) {
+            updateData.email = email;
+            updateData.verified = false
+
+            const verificationToken = jwt.sign({ email }, process.env.EMAIL_JWT_SECRET, { expiresIn: '1h' });
+            updateData.verification_token = verificationToken;
+
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.zoho.eu',
+                port: 587,
+                secure: false,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASSWORD,
+                },
+                connectionTimeout: 15000,
+                tls: {
+                    rejectUnauthorized: false,
+                }
+            });
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Please verify your email address',
+                text: `Click on the link to verify your email: ${process.env.FRONTEND_URL}/login?token=${verificationToken}`,
+            };
+
+            transporter.sendMail(mailOptions, (err, info) => {
+                if (err) {
+                    console.error('Error sending verification email', err);
+                    return res.status(500).json({ error: 'Error sending email' });
+                }
+                return res.status(201).json({
+                    message: 'User registered successfully. Please check your email to verify your account.',
+                    user_id: result[0].id,
+                });
+            });
+        }
 
         if (Object.keys(updateData).length === 0) {
             return res.status(204).json({ error: 'No information provided to update.' });

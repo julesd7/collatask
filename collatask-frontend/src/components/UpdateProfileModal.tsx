@@ -57,6 +57,11 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({ user, onSave, o
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="User Email"
                     />
+                    {email !== user.email && (
+                        <label style={{ color: 'red' }}>
+                            Changing your email will log you out and require email verification.<br />
+                        </label>
+                    )}
                     <label 
                         onClick={() => setChangePassword(!changePassword)} 
                         style={{ cursor: 'pointer' }}
