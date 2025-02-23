@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.13 (Homebrew)
--- Dumped by pg_dump version 14.13 (Homebrew)
+-- Dumped from database version 16.4
+-- Dumped by pg_dump version 16.8 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -43,6 +43,23 @@ BEGIN
     INSERT INTO boards (project_id, title) VALUES (NEW.id, 'In Progress');
     INSERT INTO boards (project_id, title) VALUES (NEW.id, 'Completed');
     RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: set_deleted_user(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.set_deleted_user() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    UPDATE messages
+    SET sender = 'DeletedUser'
+    WHERE sender = OLD.username;
+
+    RETURN OLD;
 END;
 $$;
 
@@ -178,6 +195,19 @@ CREATE SEQUENCE public.cards_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+
+
+--
+-- Name: messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.messages (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    message text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    room uuid NOT NULL,
+    sender text NOT NULL
+);
 
 
 --
@@ -352,6 +382,13 @@ CREATE TRIGGER trigger_update_project_on_card_change AFTER INSERT OR DELETE OR U
 --
 
 CREATE TRIGGER trigger_update_task_timestamp BEFORE UPDATE ON public.tasks FOR EACH ROW EXECUTE FUNCTION public.update_task_timestamp();
+
+
+--
+-- Name: users user_deletion_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER user_deletion_trigger BEFORE DELETE ON public.users FOR EACH ROW EXECUTE FUNCTION public.set_deleted_user();
 
 
 --
