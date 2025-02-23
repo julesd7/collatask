@@ -40,7 +40,14 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({ user, onSave, o
                         className="input-field"
                         type="text"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                        onChange={(e) => {
+                            const newUsername = e.target.value;
+                            const usernameRegex = /^[a-zA-Z0-9]+$/;
+                            if (!usernameRegex.test(newUsername)) {
+                                return;
+                            }
+                            setUsername(newUsername.toLowerCase());
+                        }}
                         placeholder="Username"
                     />
                     <input
