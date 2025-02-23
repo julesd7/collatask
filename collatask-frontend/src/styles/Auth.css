@@ -112,7 +112,7 @@
 
 .signup-container .google-login-container {
     margin-bottom: 30px;
-    width: 100%;
+    min-width: 100%;
 }
 
 .signup-container hr {
