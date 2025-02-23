@@ -37,7 +37,15 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
         fetchUserProfile();
         checkRoom();
         socket.emit("joinRoom", chat.room);
-    }, []);
+
+        socket.on("historicalMessages", (historicalMessages) => {
+            setMessages(historicalMessages.map((msg: { sender: string, message: string }) => ({ ...msg, sent: true })));
+        });
+
+        return () => {
+            socket.off("historicalMessages");
+        };
+    }, [chat.room]);
 
     useEffect(() => {
         socket.on("receiveMessage", (data) => {
@@ -108,7 +116,6 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
                                 </div>
                             ))
                         )}
-                        {/* Élément invisible pour scroller automatiquement */}
                         <div ref={messagesEndRef} />
                     </div>
                     <input
