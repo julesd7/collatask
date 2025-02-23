@@ -23,9 +23,15 @@ const Chat: React.FC<ChatModalProps> = ({ chat, onClose }) => {
                 withCredentials: true,
             });
             setUsername(response.data.username);
+            localStorage.setItem("username", response.data.username);
         } catch (error) {
             console.error("Error fetching user profile:", error);
-            setUsername("Anonymous");
+            const storedUsername = localStorage.getItem("username");
+            if (storedUsername) {
+                setUsername(storedUsername);
+            } else {
+                setUsername("Anonymous");
+            }
         }
     };
 
