@@ -83,5 +83,9 @@ export interface UpdateProfileModalProps {
   onDelete: () => void;
   onClose: () => void;
 }
+export interface ChatModalProps {
+  chat: { room: string | undefined; };
+  onClose: () => void;
+}
 
 export { CardI, BoardI, ProjectI, TeamMember, ProjectModalProps, BoardModalProps, BoardCreationModalProps, CardModalProps, CardCreationModalProps };

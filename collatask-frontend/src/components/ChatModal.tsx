@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
+import { ChatModalProps } from "../utils/interfaces";
+
 import "../styles/Chat.css";
+import "../styles/Modal.css";
 
 const socket = io(import.meta.env.VITE_APP_URL);
 
-const Chat: React.FC = () => {
+const Chat: React.FC<ChatModalProps> = ({chat, onClose}) => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState<{ sender: string, message: string }[]>([]);
     const [username, setUsername] = useState("");
@@ -24,8 +27,16 @@ const Chat: React.FC = () => {
         }
     };
 
+    const checkRoom = async () => {
+        if (!chat.room) {
+            chat.room = window.location.pathname.split("/").pop();
+        }
+    }
+
     useEffect(() => {
         fetchUserProfile();
+        checkRoom();
+        socket.emit("joinRoom", chat.room);
     }, []);
 
     useEffect(() => {
@@ -45,7 +56,7 @@ const Chat: React.FC = () => {
             const recentMessages = messageHistory.filter(msg => currentTime - msg.time < 13000);
 
             if (recentMessages.length < 10) {
-                socket.emit("sendMessage", { sender: username, message });
+                socket.emit("sendMessage", { sender: username, message, room: chat.room });
                 setMessage("");
                 setMessageHistory([...recentMessages, { time: currentTime }]);
             } else {
@@ -61,40 +72,27 @@ const Chat: React.FC = () => {
     };
 
     return (
-        <div className="chat-container">
-            <div className="chat-header">
-                <h2 className="chat-title">Live Chat</h2>
-            </div>
-
-            <div className="chat-messages">
-                {messages.length === 0 ? (
-                    <div className="no-messages">No messages</div>
-                ) : (
-                    messages.map((msg, index) => (
-                        <div
-                            key={index}
-                            className={`chat-message ${msg.sender === username ? "sent" : "received"}`}
-                        >
-                            <span className="chat-sender">{msg.sender}:</span> {msg.message}
-                        </div>
-                    ))
-                )}
-            </div>
-
-            <div className="chat-input-container">
-                <input
-                    type="text"
-                    className="chat-input"
-                    placeholder="Type a message..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                />
-                <button onClick={sendMessage} className="chat-send-button" disabled={!message.trim()}>
-                    Send
-                </button>
-            </div>
+        <div className="modal-overlay">
+      <div className="modal-content">
+        <button className="close-btn" onClick={onClose}>×</button>
+        <div className="modal-header">Chat with team</div>
+        <div className="modal-body">
+        <input
+            type="text"
+            className="chat-input"
+            placeholder="Type a message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            />
         </div>
+        
+        <div className="modal-footer">
+        <button onClick={sendMessage} className="chat-send-button" disabled={!message.trim()}>Send</button>
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
     );
 };
 
