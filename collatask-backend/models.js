@@ -43,6 +43,7 @@ const cards = pgTable('cards', {
   board_id: uuid('board_id').references(() => boards.id),
   project_id: uuid('project_id').references(() => projects.id),
   assignees_ids: uuid('assignees_ids'),
+  priority: varchar('priority', { length: 2 }),
 });
 
 // Project Assignments Table

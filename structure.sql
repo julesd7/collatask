@@ -180,7 +180,9 @@ CREATE TABLE public.cards (
     last_change timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     board_id uuid,
     project_id uuid,
-    assignees_ids uuid[]
+    assignees_ids uuid[],
+    priority character varying(2),
+    CONSTRAINT cards_priority_check CHECK (((priority)::text = ANY ((ARRAY['P0'::character varying, 'P1'::character varying, 'P2'::character varying, 'P3'::character varying])::text[])))
 );
 
 
