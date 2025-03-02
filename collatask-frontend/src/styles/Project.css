@@ -131,6 +131,22 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.project-container .card.P0 {
+  background-color: #ff000040;
+}
+
+.project-container .card.P1 {
+  background-color: #ffb12140;
+}
+
+.project-container .card.P2 {
+  background-color: #fff20040;
+}
+
+.project-container .card.P3 {
+  background-color: #3cff0040;
+}
+
 .project-container .card h3 {
   font-size: 18px;
   color: var(--text-color);

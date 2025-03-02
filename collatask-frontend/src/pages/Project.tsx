@@ -417,7 +417,7 @@ const Project: React.FC = () => {
                 board.cards.map((card) => (
                   <div
                     key={card.id}
-                    className="card"
+                    className={`card ${card.priority}`}
                     draggable
                     onDragStart={() => handleDragStart(card.id, board.id)}
                     onMouseDown={handleCardMouseDown}

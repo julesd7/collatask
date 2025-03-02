@@ -5,6 +5,7 @@ interface CardI {
   startDate: Date | null;
   endDate: Date | null;
   assignedMembers: string[];
+  priority: string;
 }
 
 interface BoardI {
