@@ -102,7 +102,7 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
             from: process.env.EMAIL_FROM,
             to: email,
             subject: 'You have been assigned to a project',
-            text: `You have been assigned to a project. Please login to your account to view the project details.\n\nProject name: ${projectName}\nProject link: ${process.env.FRONTEND_URL}/projects/${project_id}\nRole: ${userRole}\n\n`,
+            text: `You have been assigned to a project. Please login to your account to view the project details.\n\nProject name: ${projectName}\nProject link: ${process.env.FRONTEND_URL}/project/${project_id}\nRole: ${userRole}\n\n`,
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
