@@ -34,6 +34,31 @@
   width: 100%;
 }
 
+.modal-overlay .select-field {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+  background-color: #fff;
+  background-size: 12px;
+  cursor: pointer;
+}
+
+.modal-overlay .select-field:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.modal-overlay .priority label {
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
 .modal-overlay .input-field {
   width: 100%;
   padding: 10px;
@@ -154,6 +179,7 @@
 }
 
 .modal-overlay .assign-users h3 {
+  text-transform: uppercase;
   font-size: 1rem;
   color: #333;
   margin-bottom: 10px;
