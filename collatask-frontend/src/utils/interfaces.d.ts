@@ -74,7 +74,7 @@ interface CardModalProps {
 
 interface CardCreationModalProps {
   card: { BoardId: number; teamMembers: TeamMember[] };
-  onSave: (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, assignedMembers: string[] | null ) => void;
+  onSave: (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, assignedMembers: string[] | null, priority: string | null ) => void;
   onClose: () => void;
 }
 
