@@ -10,7 +10,7 @@ const CardModal: React.FC<CardModalProps> = ({ card, teamMembers, onSave, onDele
   const [startDate, setStartDate] = useState<Date | null>(card.startDate ? new Date(card.startDate) : null);
   const [endDate, setEndDate] = useState<Date | null>(card.endDate ? new Date(card.endDate) : null);
   const [selectedMembers, setSelectedMembers] = useState<string[]>(card.assignedMembers || []);
-  const [priority, setPriority] = useState<string | null>(card.priority || null);
+  const [priority, setPriority] = useState<string>(card.priority);
 
   const handleSave = () => {
     onSave(card.id, title, description, startDate, endDate, card.assignedMembers, selectedMembers, priority);
@@ -85,7 +85,7 @@ const CardModal: React.FC<CardModalProps> = ({ card, teamMembers, onSave, onDele
             <select
               className="select-field"
               value={priority || ""}
-              onChange={(e) => setPriority(e.target.value === "" ? null : e.target.value)}
+              onChange={(e) => setPriority(e.target.value)}
             >
               <option value="">No priority</option>
               <option value="P0">P0</option>

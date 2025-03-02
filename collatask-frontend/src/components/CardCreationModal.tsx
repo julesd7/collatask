@@ -8,7 +8,7 @@ const CardCreationModal: React.FC<CardCreationModalProps> = ({ card, onSave, onC
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [assignedMembers, setAssignedMembers] = useState<string[]>([]);
-  const [priority, setPriority] = useState<string | null>(null);
+  const [priority, setPriority] = useState<string>("");
 
   if (card.BoardId === undefined) {
     console.error('boardId is undefined');
@@ -80,7 +80,7 @@ const CardCreationModal: React.FC<CardCreationModalProps> = ({ card, onSave, onC
             <label>Priority</label>
             <select
               className="select-field"
-              onChange={(e) => setPriority(e.target.value === "" ? null : e.target.value)}
+              onChange={(e) => setPriority(e.target.value)}
             >
               <option value="">No priority</option>
               <option value="P0">P0</option>

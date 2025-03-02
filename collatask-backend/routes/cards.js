@@ -59,7 +59,7 @@ router.get('/:project_id/:board_id', authenticateJWT, async (req, res) => {
 // Endpoint to create a new card
 router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
     const { project_id, board_id } = req.params;
-    const { title, description, startDate, endDate, assignedMembers } = req.body;
+    const { title, description, startDate, endDate, assignedMembers, priority } = req.body;
     const user_id = req.user.id;
 
     if (!project_id || !board_id || !title) {
@@ -109,7 +109,8 @@ router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewe
             description: description,
             start_date: startDate ? new Date(startDate) : null,
             end_date: endDate ? new Date(endDate) : null,
-            assignees_ids: assignedIds.length > 0 ? assignedIds : null
+            assignees_ids: assignedIds.length > 0 ? assignedIds : null,
+            priority: priority
             }
         ).returning({ id: cards.id });    
 
