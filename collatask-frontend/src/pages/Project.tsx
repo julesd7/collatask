@@ -332,18 +332,18 @@ const Project: React.FC = () => {
     })));
   };
 
-  const handleCardCreation = async (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, selectedMembers: string[] | null) => {
+  const handleCardCreation = async (boardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, selectedMembers: string[] | null, priority: string) => {
     setCardCreationModalOpen(false);
     if (!title) return;
   
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${boardId}`,
-        { title, description, startDate, endDate, assignedMembers: selectedMembers },
+        { title, description, startDate, endDate, assignedMembers: selectedMembers, priority },
         { withCredentials: true }
       );
 
-      const newCard = { id: response.data.card_id, title, description: description || "", startDate, endDate, assignedMembers: selectedMembers };
+      const newCard = { id: response.data.card_id, title, description: description || "", startDate, endDate, assignedMembers: selectedMembers, priority };
 
       setBoards((prevBoards) =>
         prevBoards.map((board) =>
