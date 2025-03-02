@@ -65,9 +65,9 @@ interface BoardCreationModalProps {
 }
 
 interface CardModalProps {
-  card: { id: number; title: string; description: string; startDate: Date | null; endDate: Date | null; assignedMembers: string[]; };
+  card: { id: number; title: string; description: string; startDate: Date | null; endDate: Date | null; assignedMembers: string[]; priority: string | null };
   teamMembers: { email: string; role: string }[];
-  onSave: (cardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, oldAssignedMembers: string[] | null, newAssignedMembers: string[] | null ) => void;
+  onSave: (cardId: number, title: string, description: string, startDate: Date | null, endDate: Date | null, oldAssignedMembers: string[] | null, newAssignedMembers: string[] | null, priority: strin | null ) => void;
   onDelete: (cardId: number) => void;
   onClose: () => void;
 }

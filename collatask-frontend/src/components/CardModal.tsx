@@ -10,9 +10,10 @@ const CardModal: React.FC<CardModalProps> = ({ card, teamMembers, onSave, onDele
   const [startDate, setStartDate] = useState<Date | null>(card.startDate ? new Date(card.startDate) : null);
   const [endDate, setEndDate] = useState<Date | null>(card.endDate ? new Date(card.endDate) : null);
   const [selectedMembers, setSelectedMembers] = useState<string[]>(card.assignedMembers || []);
+  const [priority, setPriority] = useState<string | null>(card.priority || null);
 
   const handleSave = () => {
-    onSave(card.id, title, description, startDate, endDate, card.assignedMembers, selectedMembers);
+    onSave(card.id, title, description, startDate, endDate, card.assignedMembers, selectedMembers, priority);
     onClose();
   };
 
@@ -78,6 +79,20 @@ const CardModal: React.FC<CardModalProps> = ({ card, teamMembers, onSave, onDele
                 min={startDate ? startDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
               />
             </div>
+          </div>
+          <div className="priority">
+            <label>Priority</label>
+            <select
+              className="select-field"
+              value={priority || ""}
+              onChange={(e) => setPriority(e.target.value === "" ? null : e.target.value)}
+            >
+              <option value="">No priority</option>
+              <option value="P0">P0</option>
+              <option value="P1">P1</option>
+              <option value="P2">P2</option>
+              <option value="P3">P3</option>
+            </select>
           </div>
           <div className="assign-users">
             <h3>Assigned to:</h3>
