@@ -176,7 +176,7 @@ router.put('/move/:project_id/:board_id/:card_id', authenticateJWT, roleMiddlewa
 // Endpoint to update a card
 router.put('/:project_id/:card_id', authenticateJWT, roleMiddleware([],['viewer']), async (req, res) => {
     const { project_id, card_id } = req.params;
-    const { title, description, startDate, endDate } = req.body;
+    const { title, description, startDate, endDate, priority } = req.body;
     const user_id = req.user.id;
 
     if (!project_id || !card_id) {
@@ -210,7 +210,8 @@ router.put('/:project_id/:card_id', authenticateJWT, roleMiddleware([],['viewer'
             title: title,
             description: description,
             start_date: startDate ? new Date(startDate) : null,
-            end_date: endDate ? new Date(endDate) : null
+            end_date: endDate ? new Date(endDate) : null,
+            priority: priority ? priority : null,
             }
         ).where(eq(cards.id, card_id));
 
