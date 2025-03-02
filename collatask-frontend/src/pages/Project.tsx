@@ -298,10 +298,10 @@ const Project: React.FC = () => {
     );
   };
 
-  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string, updatedStartDate: Date | null, updatedEndDate: Date | null, oldAssignedMembers: string[] | null, newAssignedMembers: string[] | null) => {
+  const handleSaveCard = (cardId: number, updatedTitle: string, updatedDescription: string, updatedStartDate: Date | null, updatedEndDate: Date | null, oldAssignedMembers: string[] | null, newAssignedMembers: string[] | null, priority: string) => {
     axios.put(
       `${import.meta.env.VITE_APP_URL}/api/cards/${id}/${cardId}`,
-      { title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate },
+      { title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate, priority },
       { withCredentials: true }
     );
     const newAssignees = newAssignedMembers?.filter(
@@ -327,7 +327,7 @@ const Project: React.FC = () => {
     setBoards(prevBoards => prevBoards.map(board => ({
       ...board,
       cards: board.cards.map(card => 
-        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate, assignedMembers: newAssignedMembers } : card
+        card.id === cardId ? { ...card, title: updatedTitle, description: updatedDescription, startDate: updatedStartDate, endDate: updatedEndDate, assignedMembers: newAssignedMembers, priority } : card
       ),
     })));
   };
