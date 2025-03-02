@@ -53,7 +53,7 @@ const Project: React.FC = () => {
 
         if (boardsResponse.data.length === 0) {
           setBoards([]);
-          retreiveProjectMembers();
+          retrieveProjectMembers();
           setLoading(false);
           return;
         }
@@ -90,7 +90,7 @@ const Project: React.FC = () => {
           setError("Error while loading the boards.");
         }
       }
-      retreiveProjectMembers();
+      retrieveProjectMembers();
       setLoading(false);
     };
 
@@ -152,7 +152,7 @@ const Project: React.FC = () => {
     );
   };  
 
-  const retreiveProjectMembers = async () => {
+  const retrieveProjectMembers = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/project-assignments/${id}`, { withCredentials: true });
       setProjectsMembers(response.data.users);
