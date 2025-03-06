@@ -13,10 +13,14 @@ const Signup: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialEmail = urlParams.get('email') || '';
+    const [email, setEmail] = useState<string>(initialEmail);
+    const invitationToken = urlParams.get('token') || '';
 
     const handleGoogleLogin = async (response: any) => {
         const googleToken = response.credential;
@@ -54,6 +58,7 @@ const Signup: React.FC = () => {
                 username,
                 email,
                 password,
+                invitationToken
             };
 
             await axios.post(
