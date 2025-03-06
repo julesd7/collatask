@@ -8,7 +8,7 @@ const { OAuth2Client } = require('google-auth-library');
 
 // drizzle
 const { eq, or, and } = require('drizzle-orm');
-const { users } = require('../models');
+const { users, invitations, projectAssignments } = require('../models');
 const { db } = require('../db');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -21,7 +21,8 @@ const generateRefreshToken = (userId, rememberMe) => {
 
 // Register route
 router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, invitationToken } = req.body;
+    console.log('register', req.body);
 
     if (!username || !email || !password) {
         return res.status(400).json({ error: 'All fields are required.' });
@@ -53,6 +54,20 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
             verification_token: verificationToken
         }).returning({id: users.id});
+
+        if (invitationToken) {
+            const invitation = await db.select().from(invitations).where(eq(invitations.email, email));
+            if (invitation.length > 0) {
+                for (const i of invitation) {
+                    await db.insert(projectAssignments).values({
+                        user_id: result[0].id,
+                        project_id: i?.projectId,
+                        role: i.role || 'viewer',
+                    });
+                }
+                await db.delete(invitations).where(eq(invitations.email, email));
+            }
+        }
 
         const transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
