@@ -77,4 +77,13 @@ const messages = pgTable("messages", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-module.exports = { projects, users, boards, cards, projectAssignments, tasks, messages };
+// Invitations Table
+const invitations = pgTable('invitations', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').unique().notNull(),
+  projectId: uuid('project_id').notNull(),
+  role: text('role').default('viewer'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+module.exports = { projects, users, boards, cards, projectAssignments, tasks, messages, invitations };
