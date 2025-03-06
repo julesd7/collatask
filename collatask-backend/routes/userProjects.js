@@ -16,7 +16,7 @@ router.get('/', authenticateJWT, async (req, res) => {
         const result = await db.select({id: projects.id, title: projects.title, description: projects.description}).from(projects).innerJoin(
             projectAssignments, eq(projectAssignments.project_id, projects.id)).where(eq(projectAssignments.user_id, userId)).orderBy(sql`${projects.updated_at} DESC`);
         if (result.length === 0) {
-            return res.status(404).json({ error: 'No projects found for this user' });
+            return res.status(204).json({ error: 'No projects found for this user' });
         }
         res.status(200).json(result);
     } catch (error) {
@@ -33,7 +33,7 @@ router.get('/recent', authenticateJWT, async (req, res) => {
         const result = await db.select({id: projects.id, title: projects.title, description: projects.description, updated_at: projects.updated_at}).from(projects).innerJoin(
             projectAssignments, eq(projectAssignments.project_id, projects.id)).where(eq(projectAssignments.user_id, userId)).orderBy(sql`${projects.updated_at} DESC`);
         if (result.length === 0) {
-            return res.status(404).json({ error: 'No projects found for this user' });
+            return res.status(204).json({ error: 'No projects found for this user' });
         }
 
         res.status(200).json(result);

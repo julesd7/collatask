@@ -16,7 +16,6 @@ const MyProjects: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_APP_URL}/api/user-projects`, { withCredentials: true });
-        console.log(response.data);
         setProjects(response.data);
       } catch (error: any) {
         if (error.response?.status === 404) {
