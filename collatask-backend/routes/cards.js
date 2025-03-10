@@ -110,7 +110,7 @@ router.post('/:project_id/:board_id', authenticateJWT, roleMiddleware([],['viewe
             start_date: startDate ? new Date(startDate) : null,
             end_date: endDate ? new Date(endDate) : null,
             assignees_ids: assignedIds.length > 0 ? assignedIds : null,
-            priority: priority
+            priority: priority == "" ? null : priority
             }
         ).returning({ id: cards.id });    
 
