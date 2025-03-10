@@ -29,6 +29,7 @@ const Navbar: React.FC = () => {
         await axios.post(`${import.meta.env.VITE_APP_URL}/api/auth/logout`, {}, {
           withCredentials: true,
         });
+        navigate('/login');
         window.location.reload();
       } catch (error) {
         console.error('An error occurred while signing out.');
