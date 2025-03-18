@@ -81,7 +81,7 @@ const messages = pgTable("messages", {
 const invitations = pgTable('invitations', {
   id: uuid('id').defaultRandom().primaryKey(),
   email: text('email').unique().notNull(),
-  projectId: uuid('project_id').notNull(),
+  project_id: uuid('project_id').notNull(),
   role: text('role').default('viewer'),
   createdAt: timestamp('created_at').defaultNow(),
 });
