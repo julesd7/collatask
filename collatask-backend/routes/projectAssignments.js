@@ -66,8 +66,8 @@ router.post('/assign/:project_id', authenticateJWT, async (req, res) => {
         const existingInvitation = await db.select().from(invitations).where(eq(invitations.email, email));
         if (existingInvitation.length === 0) {
             await db.insert(invitations).values({
-                email: email,
-                projectId: project_id,
+                email,
+                project_id,
                 role: role || 'viewer'
             });
         }
